@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>過去問演習ブラウザ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>過去問演習 (第75回)</h1>
+
+    <div class="controls">
+        <label for="subject-select">科目選択:</label>
+        <select id="subject-select">
+            <option value="kanka">kanka</option>
+            <option value="kanbutsu">kanbutsu</option>
+            <option value="kannou">kannou</option>
+            <option value="kanon">kanon</option>
+            <option value="houki">houki</option>
+            <option value="kanri">kanri</option>
+            <option value="ichiki">ichiki</option>
+            </select>
+        <button id="prev-btn">前の問題</button>
+        <span id="page-num">1</span> / <span id="page-count">?</span>
+        <button id="next-btn">次の問題</button>
+    </div>
+
+    <div class="viewer">
+        <canvas id="pdf-canvas"></canvas>
+    </div>
+
+    <div class="actions">
+        <p>解答を選択してください：</p>
+        <button class="answer-btn" data-choice="1">1</button>
+        <button class="answer-btn" data-choice="2">2</button>
+        <button class="answer-btn" data-choice="3">3</button>
+        <button class="answer-btn" data-choice="4">4</button>
+        <button class="answer-btn" data-choice="5">5</button>
+    </div>
+
+    <div id="result-area"></div>
+
+    <script src="./lib/pdfjs/build/pdf.mjs" type="module"></script>
+    <script src="main.js" type="module"></script>
+</body>
+</html>
