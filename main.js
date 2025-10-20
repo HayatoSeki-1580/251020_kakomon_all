@@ -14,8 +14,8 @@ const answerButtons = document.querySelectorAll('.answer-btn');
 
 // --- グローバル変数 ---
 let pdfDoc = null;
-let currentPageNum = 1;
-let currentAnswers = {}; // 現在選択中の回の解答データを保持
+let currentPageNum = 1; // この変数は「問題番号」として扱います (1-25)
+let currentAnswers = {};
 let currentSubject = subjectSelect.value;
 let currentEdition = '';
 
@@ -23,10 +23,11 @@ let currentEdition = '';
 
 /** 索引ファイルを読み込み、実施回のセレクトボックスを初期化する */
 async function setupEditionSelector() {
+    // ... (この関数は変更なし)
     try {
         const response = await fetch('./data/editions.json');
         const data = await response.json();
-        const editions = data.available.sort((a, b) => b - a); // 新しい順にソート
+        const editions = data.available.sort((a, b) => b - a);
 
         editionSelect.innerHTML = '';
         editions.forEach(edition => {
@@ -44,28 +45,34 @@ async function setupEditionSelector() {
 
 /** 指定された回の解答JSONを読み込む */
 async function loadAnswersForEdition(edition) {
+    // ... (この関数は変更なし)
     try {
         const response = await fetch(`./pdf/${edition}/answer.json`);
         currentAnswers = await response.json();
     } catch (error) {
         console.error(`第${edition}回の解答ファイル読み込みに失敗:`, error);
         alert(`第${edition}回のanswer.jsonが見つかりません。`);
-        currentAnswers = {}; // エラー時は解答データを空にする
+        currentAnswers = {};
     }
 }
 
 /** PDFを読み込んで表示する */
 async function renderPdf() {
-    currentPageNum = 1;
+    currentPageNum = 1; // 常に問題1からスタート
     const url = `./pdf/${currentEdition}/${currentSubject}.pdf`;
 
     try {
-        pdfDoc = await pdfjsLib.getDocument(url).promise;
-        pageCountSpan.textContent = pdfDoc.numPages;
+        const loadingTask = pdfjsLib.getDocument(url);
+        pdfDoc = await loadingTask.promise;
+        
+        // 【変更】総問題数を (総ページ数 - 1) で表示
+        pageCountSpan.textContent = pdfDoc.numPages - 1;
+        
         renderPage(currentPageNum);
     } catch (error) {
         console.error('PDFの読み込みに失敗:', error);
         canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+        // 【変更】総問題数を0に
         pageCountSpan.textContent = '0';
         pageNumSpan.textContent = '0';
         alert('PDFファイルが見つかりません。');
@@ -74,14 +81,18 @@ async function renderPdf() {
 
 /** 指定されたページを描画する */
 async function renderPage(num) {
-    // ... (この関数の中身は前回の提案から変更なし)
     if (!pdfDoc) return;
-    const page = await pdfDoc.getPage(num);
+    
+    // 【最重要ポイント】問題番号に1を足して、実際のページ番号を指定する
+    const page = await pdfDoc.getPage(num + 1);
+    
     const viewport = page.getViewport({ scale: 1.8 });
     const context = canvas.getContext('2d');
     canvas.height = viewport.height;
     canvas.width = viewport.width;
     await page.render({ canvasContext: context, viewport }).promise;
+    
+    // UI上の表示はあくまで「問題番号」
     pageNumSpan.textContent = num;
     resultArea.textContent = '';
     updateNavButtons();
@@ -89,7 +100,8 @@ async function renderPage(num) {
 
 /** 正誤を判定して結果を表示する */
 function checkAnswer(selectedChoice) {
-    // 【変更】参照する変数がシンプルになった
+    // 【ポイント】このロジックは変更不要。
+    // currentPageNumは問題番号(1-25)なので、そのまま解答JSONのキーとして使える。
     if (!currentAnswers[currentSubject]?.[currentPageNum]) {
         resultArea.textContent = 'この問題の解答データがありません。';
         return;
@@ -106,9 +118,10 @@ function checkAnswer(selectedChoice) {
 
 /** ナビゲーションボタンの有効/無効を更新 */
 function updateNavButtons() {
-    // ... (この関数の中身は前回の提案から変更なし)
+    const totalQuestions = pdfDoc ? pdfDoc.numPages - 1 : 0;
     prevBtn.disabled = (currentPageNum <= 1);
-    nextBtn.disabled = (currentPageNum >= (pdfDoc ? pdfDoc.numPages : 1));
+    // 【変更】最後の問題かどうかを (総ページ数 - 1) で判定
+    nextBtn.disabled = (currentPageNum >= totalQuestions);
 }
 
 // --- イベントリスナー ---
@@ -119,12 +132,10 @@ subjectSelect.addEventListener('change', (e) => {
 
 editionSelect.addEventListener('change', async (e) => {
     currentEdition = e.target.value;
-    //【重要】回が変わったら、解答ファイルも読み込み直す
     await loadAnswersForEdition(currentEdition);
     await renderPdf();
 });
 
-// ... (prevBtn, nextBtn, answerButtonsのリスナーは変更なし)
 prevBtn.addEventListener('click', () => {
     if (currentPageNum <= 1) return;
     currentPageNum--;
@@ -132,7 +143,8 @@ prevBtn.addEventListener('click', () => {
 });
 
 nextBtn.addEventListener('click', () => {
-    if (!pdfDoc || currentPageNum >= pdfDoc.numPages) return;
+    const totalQuestions = pdfDoc ? pdfDoc.numPages - 1 : 0;
+    if (currentPageNum >= totalQuestions) return;
     currentPageNum++;
     renderPage(currentPageNum);
 });
