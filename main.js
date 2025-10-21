@@ -3,7 +3,6 @@ console.log("✅ main.js スクリプトの読み込み開始");
 
 // --- モジュールのインポート ---
 import * as pdfjsLib from './lib/pdfjs/build/pdf.mjs';
-// 【重要】ここのパスを修正しました！
 pdfjsLib.GlobalWorkerOptions.workerSrc = './lib/pdfjs/build/pdf.worker.mjs';
 
 console.log("✅ PDF.jsライブラリのインポート成功");
@@ -34,23 +33,16 @@ async function setupEditionSelector() {
     console.log("🔄 setupEditionSelector 関数を開始");
     try {
         const url = './data/editions.json';
-        console.log(`📄 editions.json を読み込みます: ${url}`);
         const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`HTTPエラー！ ステータス: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`HTTPエラー！ ステータス: ${response.status}`);
         const data = await response.json();
-        console.log("📄 editions.json のデータ:", data);
-
-        // 【変更】オブジェクトのvalueを基準に新しい順で並べ替え
+        
         const editions = data.available.sort((a, b) => b.value - a.value);
-
         editionSelect.innerHTML = '';
-        // 【変更】オブジェクト(editionInfo)から値を取り出すように修正
         editions.forEach(editionInfo => {
             const option = document.createElement('option');
-            option.value = editionInfo.value;         // 値を設定
-            option.textContent = editionInfo.displayText; // 表示テキストを設定
+            option.value = editionInfo.value;
+            option.textContent = editionInfo.displayText;
             editionSelect.appendChild(option);
         });
         currentEdition = editionSelect.value;
@@ -63,21 +55,7 @@ async function setupEditionSelector() {
 
 /** 指定された回の解答JSONを読み込む */
 async function loadAnswersForEdition(edition) {
-    console.log(`🔄 loadAnswersForEdition 関数を開始: 第${edition}回`);
-    const url = `./pdf/${edition}/${edition}_answer.json`;
-    console.log(`📄 解答ファイルを読み込みます: ${url}`);
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`HTTPエラー！ ステータス: ${response.status}`);
-        }
-        currentAnswers = await response.json();
-        console.log(`📄 第${edition}回の解答データ:`, currentAnswers);
-    } catch (error) {
-        console.error("❌ 解答ファイルの読み込みに失敗:", error);
-        alert(`解答ファイルが見つかりません。\nパス: ${url}\nコンソールを確認してください。`);
-        currentAnswers = {};
-    }
+    // ... (この関数は変更なし) ...
 }
 
 /** PDFを読み込んで表示する */
@@ -90,15 +68,14 @@ async function renderPdf() {
     const url = `./pdf/${currentEdition}/${currentEdition}_${currentSubject}.pdf`;
     console.log(`📄 PDFを読み込みます: ${url}`);
     
-    // 【重要】PDF読み込み設定オブジェクトを準備
+    // 【重要】PDF読み込み設定オブジェクト
     const loadingTaskOptions = {
-        // 【追加】ここにCMapsの場所を指定する！
         cMapUrl: './lib/pdfjs/web/cmaps/',
-        cMapPacked: true
+        cMapPacked: true,
+        standardFontDataUrl: './lib/pdfjs/web/standard_fonts/'
     };
 
     try {
-        // 【変更】準備した設定を使ってPDFを読み込む
         const loadingTask = pdfjsLib.getDocument(url, loadingTaskOptions);
         pdfDoc = await loadingTask.promise;
         
@@ -111,7 +88,24 @@ async function renderPdf() {
     }
 }
 
-/** 指定されたページを描画する */
+// ... (他の関数は変更なし) ...
+
+// (念のため、省略せず全コードを記載します)
+async function loadAnswersForEdition(edition) {
+    console.log(`🔄 loadAnswersForEdition 関数を開始: 第${edition}回`);
+    const url = `./pdf/${edition}/${edition}_answer.json`;
+    console.log(`📄 解答ファイルを読み込みます: ${url}`);
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTPエラー！ ステータス: ${response.status}`);
+        currentAnswers = await response.json();
+        console.log(`📄 第${edition}回の解答データ:`, currentAnswers);
+    } catch (error) {
+        console.error("❌ 解答ファイルの読み込みに失敗:", error);
+        alert(`解答ファイルが見つかりません。\nパス: ${url}\nコンソールを確認してください。`);
+        currentAnswers = {};
+    }
+}
 async function renderPage(num) {
     if (!pdfDoc) {
         console.warn("描画しようとしましたが、pdfDocがありません。");
@@ -123,28 +117,20 @@ async function renderPage(num) {
         const page = await pdfDoc.getPage(num + 1);
         const viewport = page.getViewport({ scale: 1.8 });
         const context = canvas.getContext('2d');
-
         canvas.height = viewport.height;
         canvas.width = viewport.width;
-
         context.clearRect(0, 0, canvas.width, canvas.height);
-
         await page.render({ canvasContext: context, viewport }).promise;
-
         pageNumSpan.textContent = num;
         resultArea.textContent = '';
         updateNavButtons();
         console.log("✅ ページ描画完了");
-
     } catch (error) {
         console.error("❌ ページ描画中に致命的なエラーが発生しました:", error);
         alert("ページの描画中にエラーが発生しました。コンソールを確認してください。");
     }
 }
-
-/** 正誤を判定して結果を表示する */
 function checkAnswer(selectedChoice) {
-    console.log(`🔘 解答ボタンクリック: ${selectedChoice}番`);
     const correctAnswer = currentAnswers?.[currentSubject]?.[currentPageNum];
     if (correctAnswer === undefined) {
         resultArea.textContent = 'この問題の解答データがありません。';
@@ -158,56 +144,29 @@ function checkAnswer(selectedChoice) {
         resultArea.className = 'incorrect';
     }
 }
-
-/** ナビゲーションボタンの有効/無効を更新 */
 function updateNavButtons() {
     const totalQuestions = pdfDoc ? pdfDoc.numPages - 1 : 0;
     prevBtn.disabled = (currentPageNum <= 1);
     nextBtn.disabled = (currentPageNum >= totalQuestions);
 }
-
-
-// --- イベントリスナーの設定 ---
-console.log("🔄 イベントリスナーを設定します");
-
-subjectSelect.addEventListener('change', (e) => {
-    currentSubject = e.target.value;
-    console.log(`🔘 科目変更: ${currentSubject}`);
-});
-
-editionSelect.addEventListener('change', (e) => {
-    currentEdition = e.target.value;
-    console.log(`🔘 実施回変更: 第${currentEdition}回`);
-});
-
 goBtn.addEventListener('click', async () => {
     console.log("🔘 表示ボタンがクリックされました");
+    window.scrollTo(0, 0);
     await loadAnswersForEdition(currentEdition);
     await renderPdf();
 });
-
+subjectSelect.addEventListener('change', (e) => { currentSubject = e.target.value; });
+editionSelect.addEventListener('change', (e) => { currentEdition = e.target.value; });
 prevBtn.addEventListener('click', () => {
-    if (currentPageNum > 1) {
-        currentPageNum--;
-        renderPage(currentPageNum);
-    }
+    if (currentPageNum > 1) { currentPageNum--; renderPage(currentPageNum); }
 });
-
 nextBtn.addEventListener('click', () => {
     const totalQuestions = pdfDoc ? pdfDoc.numPages - 1 : 0;
-    if (currentPageNum < totalQuestions) {
-        currentPageNum++;
-        renderPage(currentPageNum);
-    }
+    if (currentPageNum < totalQuestions) { currentPageNum++; renderPage(currentPageNum); }
 });
-
 answerButtons.forEach(button => {
-    button.addEventListener('click', (e) => {
-        checkAnswer(e.target.dataset.choice);
-    });
+    button.addEventListener('click', (e) => { checkAnswer(e.target.dataset.choice); });
 });
-
-/** 初期化処理 */
 async function initialize() {
     console.log("🔄 アプリケーションの初期化を開始...");
     await setupEditionSelector();
@@ -221,6 +180,4 @@ async function initialize() {
         console.error("❌ 初期化に失敗。利用可能な実施回がありません。");
     }
 }
-
-// --- アプリケーションの実行 ---
 initialize();
