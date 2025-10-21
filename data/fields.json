@@ -1,7 +1,7 @@
 {
   "houki": [
     {
-      "fieldName": "1. 総則",
+      "fieldName": "1. 総則(第1条~2条)",
       "questions": [
         { "edition": "75", "pageNum": "1" },
         { "edition": "75", "pageNum": "2" },
@@ -16,7 +16,52 @@
       ]
     },
     {
-      "fieldName": "2. 計量単位",
+      "fieldName": "2. 計量単位(第3条~9条)",
+      "questions": [
+        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "4" },
+        { "edition": "74", "pageNum": "3" },
+        { "edition": "74", "pageNum": "4" },
+        { "edition": "73", "pageNum": "3" },
+        { "edition": "73", "pageNum": "4" },
+        { "edition": "72", "pageNum": "3" },
+        { "edition": "72", "pageNum": "4" },
+        { "edition": "71", "pageNum": "3" },
+        { "edition": "71", "pageNum": "4" }
+      ]
+    }
+    {
+      "fieldName": "3. 適正な計量の実施(第10条~18条)",
+      "questions": [
+        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "4" },
+        { "edition": "74", "pageNum": "3" },
+        { "edition": "74", "pageNum": "4" },
+        { "edition": "73", "pageNum": "3" },
+        { "edition": "73", "pageNum": "4" },
+        { "edition": "72", "pageNum": "3" },
+        { "edition": "72", "pageNum": "4" },
+        { "edition": "71", "pageNum": "3" },
+        { "edition": "71", "pageNum": "4" }
+      ]
+    }
+    {
+      "fieldName": "4. 定期検査、指定定期検査期間(第19条~39条)",
+      "questions": [
+        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "4" },
+        { "edition": "74", "pageNum": "3" },
+        { "edition": "74", "pageNum": "4" },
+        { "edition": "73", "pageNum": "3" },
+        { "edition": "73", "pageNum": "4" },
+        { "edition": "72", "pageNum": "3" },
+        { "edition": "72", "pageNum": "4" },
+        { "edition": "71", "pageNum": "3" },
+        { "edition": "71", "pageNum": "4" }
+      ]
+    }
+    {
+      "fieldName": "5. 特定計量器の製造、修理、販売(第40条~52条)",
       "questions": [
         { "edition": "75", "pageNum": "3" },
         { "edition": "75", "pageNum": "4" },
