@@ -125,23 +125,6 @@ goBtn.addEventListener('click', async () => {
 
 // ... (他のイベントリスナーや関数は、デバッグメッセージ以外は変更なし) ...
 // (念のため、省略せず全コードを記載します)
-
-async function renderPage(num) {
-    if (!pdfDoc) {
-        console.warn("描画しようとしましたが、pdfDocがありません。");
-        return;
-    }
-    console.log(`🔄 ページを描画中: 問題${num} (PDFの${num + 1}ページ目)`);
-    const page = await pdfDoc.getPage(num + 1);
-    const viewport = page.getViewport({ scale: 1.8 });
-    const context = canvas.getContext('2d');
-    canvas.height = viewport.height;
-    canvas.width = viewport.width;
-    await page.render({ canvasContext: context, viewport }).promise;
-    pageNumSpan.textContent = num;
-    resultArea.textContent = '';
-    updateNavButtons();
-    console.log("✅ ページ描画完了");
 }
 
 function checkAnswer(selectedChoice) {
