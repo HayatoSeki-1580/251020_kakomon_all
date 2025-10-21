@@ -19,6 +19,7 @@ const nextBtn = document.getElementById('next-btn');
 const resultArea = document.getElementById('result-area');
 const answerButtons = document.querySelectorAll('.answer-btn');
 const jumpToSelect = document.getElementById('jump-to-select');
+const welcomeOverlay = document.getElementById('welcome-overlay');
 
 console.log("✅ HTML要素の取得完了");
 
@@ -137,7 +138,7 @@ async function renderPage(num) {
 function checkAnswer(selectedChoice) {
     const correctAnswer = currentAnswers?.[currentSubject]?.[currentPageNum];
     if (correctAnswer === undefined) {
-        resultArea.textContent = 'この問題の解答データがありません。';
+        resultArea.textContent = '解答データがありません。';
         return;
     }
     if (parseInt(selectedChoice, 10) === correctAnswer) {
@@ -159,6 +160,7 @@ function updateNavButtons() {
 // --- イベントリスナーの設定 ---
 goBtn.addEventListener('click', async () => {
     console.log("🔘 表示ボタンがクリックされました");
+    welcomeOverlay.style.display = 'none';
     window.scrollTo(0, 0);
     await loadAnswersForEdition(currentEdition);
     await renderPdf();
@@ -193,10 +195,6 @@ async function initialize() {
     console.log("🔄 アプリケーションの初期化を開始...");
     await setupEditionSelector();
     if (currentEdition) {
-        const context = canvas.getContext('2d');
-        context.font = "20px sans-serif";
-        context.textAlign = "center";
-        context.fillText("科目と実施回を選択して「表示」ボタンを押してください。", canvas.width / 2, 50);
         console.log("✅ 初期化完了。ユーザーの操作を待っています。");
     } else {
         console.error("❌ 初期化に失敗。利用可能な実施回がありません。");
