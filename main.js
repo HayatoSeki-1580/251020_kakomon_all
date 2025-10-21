@@ -42,16 +42,19 @@ async function setupEditionSelector() {
         const data = await response.json();
         console.log("📄 editions.json のデータ:", data);
 
-        const editions = data.available.sort((a, b) => b - a);
+        // 【変更】オブジェクトのvalueを基準に新しい順で並べ替え
+        const editions = data.available.sort((a, b) => b.value - a.value);
+
         editionSelect.innerHTML = '';
-        editions.forEach(edition => {
+        // 【変更】オブジェクト(editionInfo)から値を取り出すように修正
+        editions.forEach(editionInfo => {
             const option = document.createElement('option');
-            option.value = edition;
-            option.textContent = `第${edition}回`;
+            option.value = editionInfo.value;         // 値を設定
+            option.textContent = editionInfo.displayText; // 表示テキストを設定
             editionSelect.appendChild(option);
         });
         currentEdition = editionSelect.value;
-        console.log(`✅ プルダウンを生成完了。現在の選択: 第${currentEdition}回`);
+        console.log(`✅ プルダウンを生成完了。現在の選択: ${currentEdition}`);
     } catch (error) {
         console.error("❌ setupEditionSelector 関数で致命的なエラー:", error);
         alert('editions.jsonの読み込みに失敗しました。コンソールを確認してください。');
