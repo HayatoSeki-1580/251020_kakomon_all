@@ -87,3 +87,26 @@ select {
 
 .correct { color: #28a745; }
 .incorrect { color: #dc3545; }
+
+/* style.css の末尾に追加 */
+#jump-to-input {
+    width: 80px; /* ボックスの幅 */
+    padding: 0.5em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: center;
+}
+
+#jump-to-btn {
+    padding: 0.5em 1em;
+    border: none;
+    background-color: #6c757d; /* 少し違う色に */
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#jump-to-btn:hover {
+    background-color: #5a6268;
+}
