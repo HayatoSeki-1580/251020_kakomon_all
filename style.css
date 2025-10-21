@@ -7,8 +7,39 @@ body {
     background-color: #f4f4f9;
     color: #333;
 }
-h1 { color: #444; }
+h1 {
+    color: #444;
+}
 
+/* ======== タブのスタイル ======== */
+.mode-tabs {
+    display: flex;
+    margin-bottom: -1px; /* パネルの枠線と重ねる */
+    z-index: 1; /* パネルの上にタブが来るように */
+}
+
+.tab-btn {
+    padding: 0.8em 1.5em;
+    border: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    background-color: #f0f0f0; /* 非アクティブなタブの色 */
+    cursor: pointer;
+    border-radius: 8px 8px 0 0;
+    font-size: 1em;
+    font-weight: bold;
+    color: #555;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+/* アクティブなタブのスタイル */
+.tab-btn.active {
+    background-color: #fff; /* パネルと同じ背景色に */
+    border-bottom: 1px solid #fff; /* 下の枠線を消して一体化 */
+    color: #007bff; /* 文字色を強調 */
+}
+
+
+/* ======== コントロールパネルのスタイル ======== */
 .control-panel {
     display: flex;
     flex-direction: column;
@@ -16,8 +47,9 @@ h1 { color: #444; }
     width: 100%;
     max-width: 800px;
     background: #fff;
-    padding: 1em;
-    border-radius: 8px;
+    padding: 1.5em; /* 少し余白を増やす */
+    border-radius: 0 8px 8px 8px; /* 左上の角を直角に */
+    border: 1px solid #ccc; /* 枠線を明確に */
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     margin-bottom: 1em;
     box-sizing: border-box;
@@ -46,6 +78,7 @@ select {
     background-color: #fff;
 }
 
+/* ======== ナビゲーションエリアのスタイル ======== */
 .navigation {
     display: flex;
     flex-wrap: wrap;
@@ -54,7 +87,7 @@ select {
     margin-bottom: 1em;
 }
 
-.navigation button, #go-btn {
+.navigation button, #go-btn-edition, #go-btn-field {
     padding: 0.5em 1em;
     border: none;
     background-color: #007bff;
@@ -69,7 +102,7 @@ select {
     cursor: not-allowed;
 }
 
-.navigation button:hover:not(:disabled), #go-btn:hover {
+.navigation button:hover:not(:disabled), #go-btn-edition:hover, #go-btn-field:hover {
     background-color: #0056b3;
 }
 
@@ -84,6 +117,7 @@ select {
     width: 100px;
 }
 
+/* ======== PDF表示エリアのスタイル ======== */
 .viewer-container {
     position: relative;
     border: 1px solid #ccc;
@@ -92,6 +126,7 @@ select {
     max-width: 800px;
     background: #fff;
     box-sizing: border-box;
+    min-height: 300px; /* 初期表示で潰れないように高さを確保 */
 }
 
 #pdf-canvas {
@@ -121,6 +156,7 @@ select {
     margin-top: 0;
 }
 
+/* ======== 解答エリアのスタイル ======== */
 .answer-group {
     display: flex;
     align-items: center;
@@ -156,7 +192,7 @@ select {
     color: #fff;
 }
 
-#result-area {
+.result-area {
     font-size: 1.2em;
     font-weight: bold;
     min-height: 1.5em;
@@ -167,4 +203,9 @@ select {
 
 .correct { color: #28a745; }
 .incorrect { color: #dc3545; }
+
+/* ======== 汎用クラス ======== */
+.hidden {
+    display: none !important;
+}
 
