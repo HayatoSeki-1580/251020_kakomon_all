@@ -89,23 +89,6 @@ async function renderPdf() {
 }
 
 // ... (他の関数は変更なし) ...
-
-// (念のため、省略せず全コードを記載します)
-async function loadAnswersForEdition(edition) {
-    console.log(`🔄 loadAnswersForEdition 関数を開始: 第${edition}回`);
-    const url = `./pdf/${edition}/${edition}_answer.json`;
-    console.log(`📄 解答ファイルを読み込みます: ${url}`);
-    try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`HTTPエラー！ ステータス: ${response.status}`);
-        currentAnswers = await response.json();
-        console.log(`📄 第${edition}回の解答データ:`, currentAnswers);
-    } catch (error) {
-        console.error("❌ 解答ファイルの読み込みに失敗:", error);
-        alert(`解答ファイルが見つかりません。\nパス: ${url}\nコンソールを確認してください。`);
-        currentAnswers = {};
-    }
-}
 async function renderPage(num) {
     if (!pdfDoc) {
         console.warn("描画しようとしましたが、pdfDocがありません。");
