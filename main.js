@@ -18,6 +18,16 @@ const prevBtn = document.getElementById('prev-btn');
 const nextBtn = document.getElementById('next-btn');
 const resultArea = document.getElementById('result-area');
 const answerButtons = document.querySelectorAll('.answer-btn');
+// --- HTML要素の取得 ---
+const subjectSelect = document.getElementById('subject-select');
+// ... (他の要素)
+const answerButtons = document.querySelectorAll('.answer-btn');
+
+// 【追加】ここから2行追加します
+const jumpToInput = document.getElementById('jump-to-input');
+const jumpToBtn = document.getElementById('jump-to-btn');
+
+console.log("✅ HTML要素の取得完了");
 
 console.log("✅ HTML要素の取得完了");
 
@@ -173,6 +183,27 @@ nextBtn.addEventListener('click', () => {
 
 answerButtons.forEach(button => {
     button.addEventListener('click', (e) => { checkAnswer(e.target.dataset.choice); });
+});
+// ... goBtn.addEventListener('click', ...); の下あたり
+
+jumpToBtn.addEventListener('click', () => {
+    // PDFが読み込まれていなければ何もしない
+    if (!pdfDoc) return;
+
+    const totalQuestions = pdfDoc.numPages - 1;
+    // 入力された値を取得し、数字に変換
+    const targetPage = parseInt(jumpToInput.value, 10);
+
+    // 入力値が正しいかチェック
+    if (targetPage >= 1 && targetPage <= totalQuestions) {
+        console.log(`🔘 移動ボタンクリック: ${targetPage}へジャンプ`);
+        currentPageNum = targetPage; // 現在の問題番号を更新
+        renderPage(currentPageNum);  // 指定されたページを描画
+        jumpToInput.value = "";      // 入力ボックスを空にする
+    } else {
+        // 不正な値が入力された場合はアラートを表示
+        alert(`1から${totalQuestions}の間の数字を入力してください。`);
+    }
 });
 
 /** 初期化処理 */
