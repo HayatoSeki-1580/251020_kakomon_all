@@ -83,6 +83,8 @@ async function loadAnswersForEdition(edition) {
 /** PDFを読み込んで表示する */
 async function renderPdf() {
     console.log(`🔄 renderPdf 関数を開始: 第${currentEdition}回 / ${currentSubject}`);
+    const context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
     currentPageNum = 1;
     // ファイル名の規則： 75_kanka.pdf
     const url = `./pdf/${currentEdition}/${currentEdition}_${currentSubject}.pdf`;
