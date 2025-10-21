@@ -1,0 +1,27 @@
+{
+  "houki": [
+    {
+      "fieldName": "1. 総則",
+      "questions": [
+        { "edition": "75", "pageNum": "1" },
+        { "edition": "75", "pageNum": "2" },
+        { "edition": "74", "pageNum": "1" }
+      ]
+    },
+    {
+      "fieldName": "2. 計量単位",
+      "questions": [
+        { "edition": "75", "pageNum": "4" },
+        { "edition": "74", "pageNum": "5" }
+      ]
+    }
+  ],
+  "kanka": [
+    {
+      "fieldName": "A分野：○○学",
+      "questions": [
+        { "edition": "75", "pageNum": "1" }
+      ]
+    }
+  ]
+}
