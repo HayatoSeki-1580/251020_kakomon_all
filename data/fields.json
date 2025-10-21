@@ -284,67 +284,98 @@
     {
         "fieldName": "4. 測定誤差・不確かさ",
       "questions": [
-        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "5" },
+        { "edition": "75", "pageNum": "6" },
+        { "edition": "74", "pageNum": "5" },
+        { "edition": "74", "pageNum": "6" },
+        { "edition": "73", "pageNum": "3" },
+        { "edition": "73", "pageNum": "5" },
+        { "edition": "73", "pageNum": "6" },
+        { "edition": "72", "pageNum": "3" },
+        { "edition": "72", "pageNum": "6" },
+        { "edition": "71", "pageNum": "5" },
+        { "edition": "71", "pageNum": "6" }
       ]
     },
     {
         "fieldName": "5. 統計の基礎と推定・検定",
       "questions": [
-        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "7" },
+        { "edition": "75", "pageNum": "8" },
+        { "edition": "74", "pageNum": "7" },
+        { "edition": "74", "pageNum": "8" },
+        { "edition": "73", "pageNum": "7" },
+        { "edition": "73", "pageNum": "8" },
+        { "edition": "73", "pageNum": "6" },
+        { "edition": "72", "pageNum": "5" },
+        { "edition": "72", "pageNum": "7" },
+        { "edition": "72", "pageNum": "8" },
+        { "edition": "71", "pageNum": "7" },
+        { "edition": "71", "pageNum": "8" }
       ]
     },
     {
         "fieldName": "6. 実験計画法",
       "questions": [
-        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "10" },
+        { "edition": "74", "pageNum": "9" },
+        { "edition": "73", "pageNum": "10" },
+        { "edition": "73", "pageNum": "16" },
+        { "edition": "72", "pageNum": "10" },
+        { "edition": "72", "pageNum": "16" },
+        { "edition": "71", "pageNum": "10" }
       ]
     },
     {
         "fieldName": "7. 回帰分析と相関分析",
       "questions": [
-        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "9" },
+        { "edition": "74", "pageNum": "10" },
+        { "edition": "73", "pageNum": "9" },
+        { "edition": "72", "pageNum": "9" },
+        { "edition": "71", "pageNum": "9" }
       ]
     },
     {
         "fieldName": "8. 校正方法とSN比",
       "questions": [
-        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "3" }
       ]
     },
     {
         "fieldName": "9. 管理図",
       "questions": [
-        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "3" }
       ]
     },
     {
         "fieldName": "10. サンプリング",
       "questions": [
-        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "3" }
       ]
     },
     {
         "fieldName": "11. 検査",
       "questions": [
-        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "3" }
       ]
     },
     {
         "fieldName": "12. 信頼性",
       "questions": [
-        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "3" }
       ]
     },
     {
         "fieldName": "13. 自動制御",
       "questions": [
-        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "3" }
       ]
     },
     {
         "fieldName": "14. 計算機・信号伝達",
       "questions": [
-        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "3" }
       ]
     }
   ]
