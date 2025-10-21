@@ -55,10 +55,21 @@ async function setupEditionSelector() {
 
 /** 指定された回の解答JSONを読み込む */
 async function loadAnswersForEdition(edition) {
-    // ... (この関数は変更なし) ...
+    console.log(`🔄 loadAnswersForEdition 関数を開始: 第${edition}回`);
+    const url = `./pdf/${edition}/${edition}_answer.json`;
+    console.log(`📄 解答ファイルを読み込みます: ${url}`);
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTPエラー！ ステータス: ${response.status}`);
+        currentAnswers = await response.json();
+        console.log(`📄 第${edition}回の解答データ:`, currentAnswers);
+    } catch (error) {
+        console.error("❌ 解答ファイルの読み込みに失敗:", error);
+        alert(`解答ファイルが見つかりません。\nパス: ${url}\nコンソールを確認してください。`);
+        currentAnswers = {};
+    }
 }
 
-/** PDFを読み込んで表示する */
 /** PDFを読み込んで表示する */
 async function renderPdf() {
     console.log(`🔄 renderPdf 関数を開始: 第${currentEdition}回 / ${currentSubject}`);
@@ -69,16 +80,14 @@ async function renderPdf() {
     const url = `./pdf/${currentEdition}/${currentEdition}_${currentSubject}.pdf`;
     console.log(`📄 PDFを読み込みます: ${url}`);
     
-    // 【重要】PDF読み込み設定オブジェクトを準備
+    // 【最重要】PDF読み込み設定オブジェクト
     const loadingTaskOptions = {
-        // 【追加】ここに文字の地図（CMaps）の場所を指定します！
         cMapUrl: './lib/pdfjs/web/cmaps/',
         cMapPacked: true,
         standardFontDataUrl: './lib/pdfjs/web/standard_fonts/'
     };
 
     try {
-        // 【変更】準備した設定を使ってPDFを読み込む
         const loadingTask = pdfjsLib.getDocument(url, loadingTaskOptions);
         pdfDoc = await loadingTask.promise;
         
@@ -91,7 +100,7 @@ async function renderPdf() {
     }
 }
 
-// ... (他の関数は変更なし) ...
+/** 指定されたページを描画する */
 async function renderPage(num) {
     if (!pdfDoc) {
         console.warn("描画しようとしましたが、pdfDocがありません。");
@@ -116,6 +125,8 @@ async function renderPage(num) {
         alert("ページの描画中にエラーが発生しました。コンソールを確認してください。");
     }
 }
+
+/** 正誤を判定して結果を表示する */
 function checkAnswer(selectedChoice) {
     const correctAnswer = currentAnswers?.[currentSubject]?.[currentPageNum];
     if (correctAnswer === undefined) {
@@ -130,29 +141,39 @@ function checkAnswer(selectedChoice) {
         resultArea.className = 'incorrect';
     }
 }
+
+/** ナビゲーションボタンの有効/無効を更新 */
 function updateNavButtons() {
     const totalQuestions = pdfDoc ? pdfDoc.numPages - 1 : 0;
     prevBtn.disabled = (currentPageNum <= 1);
     nextBtn.disabled = (currentPageNum >= totalQuestions);
 }
+
+// --- イベントリスナーの設定 ---
 goBtn.addEventListener('click', async () => {
     console.log("🔘 表示ボタンがクリックされました");
     window.scrollTo(0, 0);
     await loadAnswersForEdition(currentEdition);
     await renderPdf();
 });
+
 subjectSelect.addEventListener('change', (e) => { currentSubject = e.target.value; });
 editionSelect.addEventListener('change', (e) => { currentEdition = e.target.value; });
+
 prevBtn.addEventListener('click', () => {
     if (currentPageNum > 1) { currentPageNum--; renderPage(currentPageNum); }
 });
+
 nextBtn.addEventListener('click', () => {
     const totalQuestions = pdfDoc ? pdfDoc.numPages - 1 : 0;
     if (currentPageNum < totalQuestions) { currentPageNum++; renderPage(currentPageNum); }
 });
+
 answerButtons.forEach(button => {
     button.addEventListener('click', (e) => { checkAnswer(e.target.dataset.choice); });
 });
+
+/** 初期化処理 */
 async function initialize() {
     console.log("🔄 アプリケーションの初期化を開始...");
     await setupEditionSelector();
@@ -166,4 +187,6 @@ async function initialize() {
         console.error("❌ 初期化に失敗。利用可能な実施回がありません。");
     }
 }
+
+// --- アプリケーションの実行 ---
 initialize();
