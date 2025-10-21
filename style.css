@@ -209,3 +209,8 @@ select {
     display: none !important;
 }
 
+/* ======== 頻出度バーのスタイル ======== */
+#field-select {
+    /* バーの文字幅を揃えるための等幅フォントを指定 */
+    font-family: Consolas, "Courier New", monospace;
+}
