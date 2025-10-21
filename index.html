@@ -3,59 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>計量士過去問くん</title>
+    <title>過去問演習ブラウザ</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>計量士過去問くん</h1>
+    <h1>過去問演習ブラウザ</h1>
 
-    <div class="controls">
-        <div class="select-group">
-            <label for="subject-select">科目選択:</label>
-            <select id="subject-select">
-                <option value="kanka">環化</option>
-                <option value="kanbutsu">環物</option>
-                <option value="kannou">環濃</option>
-                <option value="kanon">環音</option>
-                <option value="houki">法規</option>
-                <option value="kanri">管理</option>
-                <option value="ichiki">一基</option>
-                <option value="keishitsu">計質</option>
-            </select>
-        </div>
-        <div class="select-group">
-            <label for="edition-select">実施回選択:</label>
-            <select id="edition-select">
+    <div class="control-panel">
+        <div class="top-row">
+            <div class="select-group">
+                <label for="subject-select">科目:</label>
+                <select id="subject-select">
+                    <option value="kanka">あいう</option>
+                    <option value="kanbutsu">えお</option>
+                    <!-- 他の科目も同様に -->
                 </select>
+            </div>
+            <div class="select-group">
+                <label for="edition-select">実施回:</label>
+                <select id="edition-select"></select>
+            </div>
+            <button id="go-btn">表示</button>
         </div>
-        <button id="go-btn">表示</button>
+        <div class="actions-row">
+            <div class="answer-buttons">
+                <button class="answer-btn" data-choice="1">1</button>
+                <button class="answer-btn" data-choice="2">2</button>
+                <button class="answer-btn" data-choice="3">3</button>
+                <button class="answer-btn" data-choice="4">4</button>
+                <button class="answer-btn" data-choice="5">5</button>
+            </div>
+            <div id="result-area"></div>
+        </div>
     </div>
 
-   <div class="navigation">
-    <button id="prev-btn">◀ 前の問題</button>
-    <span id="page-indicator">問 <span id="page-num">?</span> / <span id="page-count">?</span></span>
-    <button id="next-btn">次の問題 ▶</button>
-
-    <input type="number" id="jump-to-input" min="1" placeholder="問番号">
-    <button id="jump-to-btn">移動</button>
-</div>
+    <div class="navigation">
+        <button id="prev-btn">◀ 前の問題</button>
+        <span id="page-indicator">問 <span id="page-num">?</span> / <span id="page-count">?</span></span>
+        <button id="next-btn">次の問題 ▶</button>
+        <!-- ジャンプ機能をプルダウンに変更 -->
+        <select id="jump-to-select" class="jump-select">
+            <option value="">移動...</option>
+        </select>
+    </div>
 
     <div class="viewer-container">
         <canvas id="pdf-canvas"></canvas>
     </div>
 
-    <div class="actions">
-        <p>解答を選択してください：</p>
-        <button class="answer-btn" data-choice="1">1</button>
-        <button class="answer-btn" data-choice="2">2</button>
-        <button class="answer-btn" data-choice="3">3</button>
-        <button class="answer-btn" data-choice="4">4</button>
-        <button class="answer-btn" data-choice="5">5</button>
-    </div>
-
-    <div id="result-area"></div>
-
     <script src="main.js" type="module"></script>
-
 </body>
 </html>
