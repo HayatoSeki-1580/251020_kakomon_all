@@ -31,11 +31,14 @@
         <button id="go-btn">表示</button>
     </div>
 
-    <div class="navigation">
-        <button id="prev-btn">◀ 前の問題</button>
-        <span id="page-indicator">問 <span id="page-num">?</span> / <span id="page-count">?</span></span>
-        <button id="next-btn">次の問題 ▶</button>
-    </div>
+   <div class="navigation">
+    <button id="prev-btn">◀ 前の問題</button>
+    <span id="page-indicator">問 <span id="page-num">?</span> / <span id="page-count">?</span></span>
+    <button id="next-btn">次の問題 ▶</button>
+
+    <input type="number" id="jump-to-input" min="1" placeholder="問番号">
+    <button id="jump-to-btn">移動</button>
+</div>
 
     <div class="viewer-container">
         <canvas id="pdf-canvas"></canvas>
