@@ -225,7 +225,55 @@
     {
       "fieldName": "1. 計量管理の進め方",
       "questions": [
-        { "edition": "75", "pageNum": "1" }
+        { "edition": "75", "pageNum": "1" },
+        { "edition": "75", "pageNum": "2" },
+        { "edition": "75", "pageNum": "21" },
+        { "edition": "75", "pageNum": "23" },
+        { "edition": "74", "pageNum": "1" },
+        { "edition": "74", "pageNum": "2" },
+        { "edition": "74", "pageNum": "21" },
+        { "edition": "74", "pageNum": "23" },
+        { "edition": "74", "pageNum": "24" },
+        { "edition": "73", "pageNum": "1" },
+        { "edition": "73", "pageNum": "2" },
+        { "edition": "73", "pageNum": "21" },
+        { "edition": "73", "pageNum": "23" },
+        { "edition": "73", "pageNum": "24" },
+        { "edition": "72", "pageNum": "1" },
+        { "edition": "72", "pageNum": "2" },
+        { "edition": "72", "pageNum": "21" },
+        { "edition": "72", "pageNum": "23" },
+        { "edition": "71", "pageNum": "1" },
+        { "edition": "71", "pageNum": "2" },
+        { "edition": "71", "pageNum": "21" },
+        { "edition": "71", "pageNum": "24" }
+      ]
+    },
+    {
+      "fieldName": "2. 単位・標準・トレーサビリティ",
+      "questions": [
+        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "4" },
+        { "edition": "75", "pageNum": "11" },
+        { "edition": "75", "pageNum": "12" },
+        { "edition": "75", "pageNum": "25" },
+        { "edition": "74", "pageNum": "4" },
+        { "edition": "74", "pageNum": "11" },
+        { "edition": "74", "pageNum": "12" },
+        { "edition": "74", "pageNum": "25" },
+        { "edition": "73", "pageNum": "4" },
+        { "edition": "73", "pageNum": "11" },
+        { "edition": "73", "pageNum": "12" },
+        { "edition": "73", "pageNum": "25" },
+        { "edition": "72", "pageNum": "4" },
+        { "edition": "72", "pageNum": "11" },
+        { "edition": "72", "pageNum": "12" },
+        { "edition": "72", "pageNum": "25" },
+        { "edition": "71", "pageNum": "3" },
+        { "edition": "71", "pageNum": "4" },
+        { "edition": "71", "pageNum": "11" },
+        { "edition": "71", "pageNum": "12" },
+        { "edition": "71", "pageNum": "25" }
       ]
     }
   ]
