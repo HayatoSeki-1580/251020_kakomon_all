@@ -89,8 +89,19 @@ async function renderPdf() {
     currentPageNum = 1;
     const url = `./pdf/${currentEdition}/${currentEdition}_${currentSubject}.pdf`;
     console.log(`📄 PDFを読み込みます: ${url}`);
+    
+    // 【重要】PDF読み込み設定オブジェクトを準備
+    const loadingTaskOptions = {
+        // 【追加】ここにCMapsの場所を指定する！
+        cMapUrl: './lib/pdfjs/web/cmaps/',
+        cMapPacked: true
+    };
+
     try {
-        pdfDoc = await pdfjsLib.getDocument(url).promise;
+        // 【変更】準備した設定を使ってPDFを読み込む
+        const loadingTask = pdfjsLib.getDocument(url, loadingTaskOptions);
+        pdfDoc = await loadingTask.promise;
+        
         console.log("📄 PDFの読み込み成功。総ページ数:", pdfDoc.numPages);
         pageCountSpan.textContent = pdfDoc.numPages > 1 ? pdfDoc.numPages - 1 : 0;
         await renderPage(currentPageNum);
