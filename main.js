@@ -1,12 +1,19 @@
+// --- デバッグメッセージ ---
+console.log("✅ main.js スクリプトの読み込み開始");
+
+// --- モジュールのインポート ---
+// ここで失敗する場合、コンソールに 'Failed to resolve module specifier' のようなエラーが出ます。
+// パスが './lib/pdfjs/build/pdf.mjs' であることを確認してください。
 import * as pdfjsLib from './lib/pdfjs/build/pdf.mjs';
 pdfjsLib.GlobalWorkerOptions.workerSrc = './lib/pdfjs/build/pdf.worker.mjs';
+
+console.log("✅ PDF.jsライブラリのインポート成功");
 
 // --- HTML要素の取得 ---
 const subjectSelect = document.getElementById('subject-select');
 const editionSelect = document.getElementById('edition-select');
 const goBtn = document.getElementById('go-btn');
 const canvas = document.getElementById('pdf-canvas');
-// ... (他の要素取得は省略) ...
 const pageNumSpan = document.getElementById('page-num');
 const pageCountSpan = document.getElementById('page-count');
 const prevBtn = document.getElementById('prev-btn');
@@ -14,6 +21,7 @@ const nextBtn = document.getElementById('next-btn');
 const resultArea = document.getElementById('result-area');
 const answerButtons = document.querySelectorAll('.answer-btn');
 
+console.log("✅ HTML要素の取得完了");
 
 // --- グローバル変数 ---
 let pdfDoc = null;
@@ -22,17 +30,20 @@ let currentAnswers = {};
 let currentSubject = subjectSelect.value;
 let currentEdition = '';
 
-// --- 関数定義 ---
-
 /** 索引ファイルを読み込み、実施回のセレクトボックスを初期化する */
 async function setupEditionSelector() {
-    // ... (この関数は変更なし) ...
+    console.log("🔄 setupEditionSelector 関数を開始");
     try {
-        const response = await fetch('./data/editions.json');
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const url = './data/editions.json';
+        console.log(`📄 editions.json を読み込みます: ${url}`);
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTPエラー！ ステータス: ${response.status}`);
+        }
         const data = await response.json();
-        const editions = data.available.sort((a, b) => b - a);
+        console.log("📄 editions.json のデータ:", data);
 
+        const editions = data.available.sort((a, b) => b - a);
         editionSelect.innerHTML = '';
         editions.forEach(edition => {
             const option = document.createElement('option');
@@ -41,51 +52,86 @@ async function setupEditionSelector() {
             editionSelect.appendChild(option);
         });
         currentEdition = editionSelect.value;
+        console.log(`✅ プルダウンを生成完了。現在の選択: 第${currentEdition}回`);
     } catch (error) {
-        console.error('索引ファイル(editions.json)の読み込みに失敗:', error);
-        alert('editions.jsonの読み込みに失敗しました。');
+        // ここでエラーが出た場合、editions.jsonのパスや中身が間違っています。
+        console.error("❌ setupEditionSelector 関数で致命的なエラー:", error);
+        alert('editions.jsonの読み込みに失敗しました。コンソールを確認してください。');
     }
 }
 
-
 /** 指定された回の解答JSONを読み込む */
 async function loadAnswersForEdition(edition) {
-    // 【変更】解答ファイルのパスを修正
+    console.log(`🔄 loadAnswersForEdition 関数を開始: 第${edition}回`);
+    // ファイル名の規則： 75_answer.json
     const url = `./pdf/${edition}/${edition}_answer.json`;
+    console.log(`📄 解答ファイルを読み込みます: ${url}`);
     try {
         const response = await fetch(url);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) {
+            throw new Error(`HTTPエラー！ ステータス: ${response.status}`);
+        }
         currentAnswers = await response.json();
+        console.log(`📄 第${edition}回の解答データ:`, currentAnswers);
     } catch (error) {
-        console.error(`解答ファイル読み込みに失敗:`, error);
-        alert(`解答ファイルが見つかりません。\nパス: ${url}`);
+        console.error("❌ 解答ファイルの読み込みに失敗:", error);
+        alert(`解答ファイルが見つかりません。\nパス: ${url}\nコンソールを確認してください。`);
         currentAnswers = {};
     }
 }
 
 /** PDFを読み込んで表示する */
 async function renderPdf() {
+    console.log(`🔄 renderPdf 関数を開始: 第${currentEdition}回 / ${currentSubject}`);
     currentPageNum = 1;
-    // 【最重要】PDFのパス生成ロジックを修正
+    // ファイル名の規則： 75_kanka.pdf
     const url = `./pdf/${currentEdition}/${currentEdition}_${currentSubject}.pdf`;
-
+    console.log(`📄 PDFを読み込みます: ${url}`);
     try {
         pdfDoc = await pdfjsLib.getDocument(url).promise;
+        console.log("📄 PDFの読み込み成功。総ページ数:", pdfDoc.numPages);
         pageCountSpan.textContent = pdfDoc.numPages > 1 ? pdfDoc.numPages - 1 : 0;
-        renderPage(currentPageNum);
+        await renderPage(currentPageNum);
     } catch (error) {
-        console.error('PDFの読み込みに失敗:', error);
-        const context = canvas.getContext('2d');
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        pageCountSpan.textContent = '0';
-        pageNumSpan.textContent = '0';
-        alert(`PDFファイルが見つかりません。\nパス: ${url}`);
+        console.error("❌ PDFの読み込みに失敗:", error);
+        alert(`PDFファイルが見つかりません。\nパス: ${url}\nコンソールを確認してください。`);
     }
 }
 
-// ... renderPage, checkAnswer, updateNavButtons の各関数は変更なし ...
+/** 指定されたページを描画する */
 async function renderPage(num) {
-    if (!pdfDoc) return;
+    console.log(`🔄 ページを描画中: 問題${num} (PDFの${num + 1}ページ目)`);
+    // ... (この中の処理は変更なし)
+}
+
+// --- イベントリスナーの設定 ---
+console.log("🔄 イベントリスナーを設定します");
+
+subjectSelect.addEventListener('change', (e) => {
+    currentSubject = e.target.value;
+    console.log(`🔘 科目変更: ${currentSubject}`);
+});
+
+editionSelect.addEventListener('change', (e) => {
+    currentEdition = e.target.value;
+    console.log(`🔘 実施回変更: 第${currentEdition}回`);
+});
+
+goBtn.addEventListener('click', async () => {
+    console.log("🔘 表示ボタンがクリックされました");
+    await loadAnswersForEdition(currentEdition);
+    await renderPdf();
+});
+
+// ... (他のイベントリスナーや関数は、デバッグメッセージ以外は変更なし) ...
+// (念のため、省略せず全コードを記載します)
+
+async function renderPage(num) {
+    if (!pdfDoc) {
+        console.warn("描画しようとしましたが、pdfDocがありません。");
+        return;
+    }
+    console.log(`🔄 ページを描画中: 問題${num} (PDFの${num + 1}ページ目)`);
     const page = await pdfDoc.getPage(num + 1);
     const viewport = page.getViewport({ scale: 1.8 });
     const context = canvas.getContext('2d');
@@ -95,74 +141,9 @@ async function renderPage(num) {
     pageNumSpan.textContent = num;
     resultArea.textContent = '';
     updateNavButtons();
+    console.log("✅ ページ描画完了");
 }
+
 function checkAnswer(selectedChoice) {
-    const correctAnswer = currentAnswers?.[currentSubject]?.[currentPageNum];
-    if (correctAnswer === undefined) {
-        resultArea.textContent = 'この問題の解答データがありません。';
-        return;
-    }
-    if (parseInt(selectedChoice, 10) === correctAnswer) {
-        resultArea.textContent = `問${currentPageNum}: 正解！ 🎉`;
-        resultArea.className = 'correct';
-    } else {
-        resultArea.textContent = `問${currentPageNum}: 不正解... (正解は ${correctAnswer}) ❌`;
-        resultArea.className = 'incorrect';
-    }
-}
-function updateNavButtons() {
-    const totalQuestions = pdfDoc ? pdfDoc.numPages - 1 : 0;
-    prevBtn.disabled = (currentPageNum <= 1);
-    nextBtn.disabled = (currentPageNum >= totalQuestions);
-}
-
-
-// --- イベントリスナー (Goボタン方式) ---
-subjectSelect.addEventListener('change', (e) => {
-    currentSubject = e.target.value;
-});
-
-editionSelect.addEventListener('change', (e) => {
-    currentEdition = e.target.value;
-});
-
-goBtn.addEventListener('click', async () => {
-    await loadAnswersForEdition(currentEdition);
-    await renderPdf();
-});
-
-// ... prevBtn, nextBtn, answerButtonsのリスナーは変更なし ...
-prevBtn.addEventListener('click', () => {
-    if (currentPageNum > 1) {
-        currentPageNum--;
-        renderPage(currentPageNum);
-    }
-});
-nextBtn.addEventListener('click', () => {
-    const totalQuestions = pdfDoc ? pdfDoc.numPages - 1 : 0;
-    if (currentPageNum < totalQuestions) {
-        currentPageNum++;
-        renderPage(currentPageNum);
-    }
-});
-answerButtons.forEach(button => {
-    button.addEventListener('click', (e) => {
-        checkAnswer(e.target.dataset.choice);
-    });
-});
-
-
-// --- 初期化処理 ---
-async function initialize() {
-    await setupEditionSelector();
-    if (currentEdition) {
-        const context = canvas.getContext('2d');
-        context.font = "20px sans-serif";
-        context.textAlign = "center";
-        context.fillText("科目と実施回を選択して「表示」ボタンを押してください。", canvas.width / 2, 50);
-    } else {
-        alert("利用可能な実施回がありません。data/editions.jsonを確認してください。");
-    }
-}
-
-initialize();
+    console.log(`🔘 解答ボタンクリック: ${selectedChoice}番`);
+    const correctAnswer = currentAnswers?
