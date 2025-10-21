@@ -59,6 +59,7 @@ async function loadAnswersForEdition(edition) {
 }
 
 /** PDFを読み込んで表示する */
+/** PDFを読み込んで表示する */
 async function renderPdf() {
     console.log(`🔄 renderPdf 関数を開始: 第${currentEdition}回 / ${currentSubject}`);
     const context = canvas.getContext('2d');
@@ -68,14 +69,16 @@ async function renderPdf() {
     const url = `./pdf/${currentEdition}/${currentEdition}_${currentSubject}.pdf`;
     console.log(`📄 PDFを読み込みます: ${url}`);
     
-    // 【重要】PDF読み込み設定オブジェクト
+    // 【重要】PDF読み込み設定オブジェクトを準備
     const loadingTaskOptions = {
+        // 【追加】ここに文字の地図（CMaps）の場所を指定します！
         cMapUrl: './lib/pdfjs/web/cmaps/',
         cMapPacked: true,
         standardFontDataUrl: './lib/pdfjs/web/standard_fonts/'
     };
 
     try {
+        // 【変更】準備した設定を使ってPDFを読み込む
         const loadingTask = pdfjsLib.getDocument(url, loadingTaskOptions);
         pdfDoc = await loadingTask.promise;
         
