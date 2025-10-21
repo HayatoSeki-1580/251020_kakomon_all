@@ -29,7 +29,7 @@
         { "edition": "71", "pageNum": "3" },
         { "edition": "71", "pageNum": "4" }
       ]
-    }
+    },
     {
       "fieldName": "3. 適正な計量の実施(第10条~18条)",
       "questions": [
@@ -44,7 +44,7 @@
         { "edition": "71", "pageNum": "3" },
         { "edition": "71", "pageNum": "4" }
       ]
-    }
+    },
     {
       "fieldName": "4. 定期検査、指定定期検査期間(第19条~39条)",
       "questions": [
@@ -59,9 +59,39 @@
         { "edition": "71", "pageNum": "3" },
         { "edition": "71", "pageNum": "4" }
       ]
-    }
+    },
     {
       "fieldName": "5. 特定計量器の製造、修理、販売(第40条~52条)",
+      "questions": [
+        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "4" },
+        { "edition": "74", "pageNum": "3" },
+        { "edition": "74", "pageNum": "4" },
+        { "edition": "73", "pageNum": "3" },
+        { "edition": "73", "pageNum": "4" },
+        { "edition": "72", "pageNum": "3" },
+        { "edition": "72", "pageNum": "4" },
+        { "edition": "71", "pageNum": "3" },
+        { "edition": "71", "pageNum": "4" }
+      ]
+    },
+    {
+      "fieldName": "6. 特別な計量器(第53条~69条)",
+      "questions": [
+        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "4" },
+        { "edition": "74", "pageNum": "3" },
+        { "edition": "74", "pageNum": "4" },
+        { "edition": "73", "pageNum": "3" },
+        { "edition": "73", "pageNum": "4" },
+        { "edition": "72", "pageNum": "3" },
+        { "edition": "72", "pageNum": "4" },
+        { "edition": "71", "pageNum": "3" },
+        { "edition": "71", "pageNum": "4" }
+      ]
+    },
+    {
+      "fieldName": "7. 検定等(第70条~75条)",
       "questions": [
         { "edition": "75", "pageNum": "3" },
         { "edition": "75", "pageNum": "4" },
