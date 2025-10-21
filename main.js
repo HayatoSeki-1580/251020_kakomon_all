@@ -36,7 +36,6 @@ let currentAnswers = {};
 let fieldsData = {};
 let currentFieldQuestions = [];
 let currentFieldIndex = 0;
-// 【修正】正しい要素から初期値を取得
 let currentSubject = subjectSelectEdition.value;
 let currentEdition = '';
 
@@ -156,10 +155,29 @@ function populateFieldSelector() {
     const subject = subjectSelectField.value;
     const fields = fieldsData[subject] || [];
     fieldSelect.innerHTML = '';
+
+    if (fields.length === 0) return;
+
+    // この科目で最も問題数が多い分野を見つけ、バーの長さを調整する基準にする
+    const maxQuestions = Math.max(...fields.map(field => field.questions.length));
+
     fields.forEach((field, index) => {
         const option = document.createElement('option');
+        const questionCount = field.questions.length;
+
+        // --- グラフバーを生成 ---
+        const barChar = '█'; // バーに使う文字
+        const maxBarLength = 10; // バーの最大長（文字数）
+        let bar = '';
+        if (maxQuestions > 0) {
+            // 問題数に応じてバーの長さを計算
+            const barLength = Math.round((questionCount / maxQuestions) * maxBarLength);
+            bar = barChar.repeat(barLength);
+        }
+
         option.value = index;
-        option.textContent = field.fieldName;
+        // 表示テキストを「分野名 (XX問) バー」の形式にする
+        option.textContent = `${field.fieldName} (${questionCount}問) ${bar}`;
         fieldSelect.appendChild(option);
     });
 }
