@@ -1,7 +1,7 @@
 {
   "houki": [
     {
-      "fieldName": "1. 総則(第1条~2条)",
+      "fieldName": "1. 総則(第1条~第2条)",
       "questions": [
         { "edition": "75", "pageNum": "1" },
         { "edition": "75", "pageNum": "2" },
@@ -16,7 +16,7 @@
       ]
     },
     {
-      "fieldName": "2. 計量単位(第3条~9条)",
+      "fieldName": "2. 計量単位(第3条~第9条)",
       "questions": [
         { "edition": "75", "pageNum": "3" },
         { "edition": "75", "pageNum": "4" },
@@ -31,7 +31,7 @@
       ]
     },
     {
-      "fieldName": "3. 適正な計量の実施(第10条~18条)",
+      "fieldName": "3. 適正な計量の実施(第10条~第18条)",
       "questions": [
         { "edition": "75", "pageNum": "3" },
         { "edition": "75", "pageNum": "4" },
@@ -46,7 +46,7 @@
       ]
     },
     {
-      "fieldName": "4. 定期検査、指定定期検査期間(第19条~39条)",
+      "fieldName": "4. 定期検査、指定定期検査期間(第19条~第39条)",
       "questions": [
         { "edition": "75", "pageNum": "3" },
         { "edition": "75", "pageNum": "4" },
@@ -61,7 +61,7 @@
       ]
     },
     {
-      "fieldName": "5. 特定計量器の製造、修理、販売(第40条~52条)",
+      "fieldName": "5. 特定計量器の製造、修理、販売(第40条~第52条)",
       "questions": [
         { "edition": "75", "pageNum": "3" },
         { "edition": "75", "pageNum": "4" },
@@ -76,7 +76,7 @@
       ]
     },
     {
-      "fieldName": "6. 特別な計量器(第53条~69条)",
+      "fieldName": "6. 特別な計量器(第53条~第69条)",
       "questions": [
         { "edition": "75", "pageNum": "3" },
         { "edition": "75", "pageNum": "4" },
@@ -91,7 +91,187 @@
       ]
     },
     {
-      "fieldName": "7. 検定等(第70条~75条)",
+      "fieldName": "7. 検定等(第70条~第75条)",
+      "questions": [
+        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "4" },
+        { "edition": "74", "pageNum": "3" },
+        { "edition": "74", "pageNum": "4" },
+        { "edition": "73", "pageNum": "3" },
+        { "edition": "73", "pageNum": "4" },
+        { "edition": "72", "pageNum": "3" },
+        { "edition": "72", "pageNum": "4" },
+        { "edition": "71", "pageNum": "3" },
+        { "edition": "71", "pageNum": "4" }
+      ]
+    },
+    {
+      "fieldName": "8. 型式の承認(第76条~第89条)",
+      "questions": [
+        { "edition": "75", "pageNum": "1" },
+        { "edition": "75", "pageNum": "2" },
+        { "edition": "74", "pageNum": "1" },
+        { "edition": "74", "pageNum": "2" },
+        { "edition": "73", "pageNum": "1" },
+        { "edition": "73", "pageNum": "2" },
+        { "edition": "72", "pageNum": "1" },
+        { "edition": "72", "pageNum": "2" },
+        { "edition": "71", "pageNum": "1" },
+        { "edition": "71", "pageNum": "2" }
+      ]
+    },
+    {
+      "fieldName": "9. 指定製造事業者(第90条~第101条)",
+      "questions": [
+        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "4" },
+        { "edition": "74", "pageNum": "3" },
+        { "edition": "74", "pageNum": "4" },
+        { "edition": "73", "pageNum": "3" },
+        { "edition": "73", "pageNum": "4" },
+        { "edition": "72", "pageNum": "3" },
+        { "edition": "72", "pageNum": "4" },
+        { "edition": "71", "pageNum": "3" },
+        { "edition": "71", "pageNum": "4" }
+      ]
+    },
+    {
+      "fieldName": "10. 基準器検査、指定検定機関(第102条~第106条)",
+      "questions": [
+        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "4" },
+        { "edition": "74", "pageNum": "3" },
+        { "edition": "74", "pageNum": "4" },
+        { "edition": "73", "pageNum": "3" },
+        { "edition": "73", "pageNum": "4" },
+        { "edition": "72", "pageNum": "3" },
+        { "edition": "72", "pageNum": "4" },
+        { "edition": "71", "pageNum": "3" },
+        { "edition": "71", "pageNum": "4" }
+      ]
+    },
+    {
+      "fieldName": "11. 計量証明の事業(第107条~第115条)",
+      "questions": [
+        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "4" },
+        { "edition": "74", "pageNum": "3" },
+        { "edition": "74", "pageNum": "4" },
+        { "edition": "73", "pageNum": "3" },
+        { "edition": "73", "pageNum": "4" },
+        { "edition": "72", "pageNum": "3" },
+        { "edition": "72", "pageNum": "4" },
+        { "edition": "71", "pageNum": "3" },
+        { "edition": "71", "pageNum": "4" }
+      ]
+    },
+    {
+      "fieldName": "12. 計量証明検査(第116条~第121条)",
+      "questions": [
+        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "4" },
+        { "edition": "74", "pageNum": "3" },
+        { "edition": "74", "pageNum": "4" },
+        { "edition": "73", "pageNum": "3" },
+        { "edition": "73", "pageNum": "4" },
+        { "edition": "72", "pageNum": "3" },
+        { "edition": "72", "pageNum": "4" },
+        { "edition": "71", "pageNum": "3" },
+        { "edition": "71", "pageNum": "4" }
+      ]
+    },
+    {
+      "fieldName": "13. 特定計量証明事業、特定計量証明認定機関(第121条の二~第121条の十)",
+      "questions": [
+        { "edition": "75", "pageNum": "1" },
+        { "edition": "75", "pageNum": "2" },
+        { "edition": "74", "pageNum": "1" },
+        { "edition": "74", "pageNum": "2" },
+        { "edition": "73", "pageNum": "1" },
+        { "edition": "73", "pageNum": "2" },
+        { "edition": "72", "pageNum": "1" },
+        { "edition": "72", "pageNum": "2" },
+        { "edition": "71", "pageNum": "1" },
+        { "edition": "71", "pageNum": "2" }
+      ]
+    },
+    {
+      "fieldName": "14. 計量士(第122条~第126条)",
+      "questions": [
+        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "4" },
+        { "edition": "74", "pageNum": "3" },
+        { "edition": "74", "pageNum": "4" },
+        { "edition": "73", "pageNum": "3" },
+        { "edition": "73", "pageNum": "4" },
+        { "edition": "72", "pageNum": "3" },
+        { "edition": "72", "pageNum": "4" },
+        { "edition": "71", "pageNum": "3" },
+        { "edition": "71", "pageNum": "4" }
+      ]
+    },
+    {
+      "fieldName": "15. 適正計量管理事業所(第127条~第133条)",
+      "questions": [
+        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "4" },
+        { "edition": "74", "pageNum": "3" },
+        { "edition": "74", "pageNum": "4" },
+        { "edition": "73", "pageNum": "3" },
+        { "edition": "73", "pageNum": "4" },
+        { "edition": "72", "pageNum": "3" },
+        { "edition": "72", "pageNum": "4" },
+        { "edition": "71", "pageNum": "3" },
+        { "edition": "71", "pageNum": "4" }
+      ]
+    },
+    {
+      "fieldName": "16. 特定標準器による校正等(第134条~第142条)",
+      "questions": [
+        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "4" },
+        { "edition": "74", "pageNum": "3" },
+        { "edition": "74", "pageNum": "4" },
+        { "edition": "73", "pageNum": "3" },
+        { "edition": "73", "pageNum": "4" },
+        { "edition": "72", "pageNum": "3" },
+        { "edition": "72", "pageNum": "4" },
+        { "edition": "71", "pageNum": "3" },
+        { "edition": "71", "pageNum": "4" }
+      ]
+    },
+    {
+      "fieldName": "17. 特定標準器以外の計量器による校正等(第143条~第146条)",
+      "questions": [
+        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "4" },
+        { "edition": "74", "pageNum": "3" },
+        { "edition": "74", "pageNum": "4" },
+        { "edition": "73", "pageNum": "3" },
+        { "edition": "73", "pageNum": "4" },
+        { "edition": "72", "pageNum": "3" },
+        { "edition": "72", "pageNum": "4" },
+        { "edition": "71", "pageNum": "3" },
+        { "edition": "71", "pageNum": "4" }
+      ]
+    },
+    {
+      "fieldName": "18. 雑則及び罰則(第147条~第169条の二)(第170条~第180条)",
+      "questions": [
+        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "4" },
+        { "edition": "74", "pageNum": "3" },
+        { "edition": "74", "pageNum": "4" },
+        { "edition": "73", "pageNum": "3" },
+        { "edition": "73", "pageNum": "4" },
+        { "edition": "72", "pageNum": "3" },
+        { "edition": "72", "pageNum": "4" },
+        { "edition": "71", "pageNum": "3" },
+        { "edition": "71", "pageNum": "4" }
+      ]
+    },
+    {
+      "fieldName": "19. その他",
       "questions": [
         { "edition": "75", "pageNum": "3" },
         { "edition": "75", "pageNum": "4" },
