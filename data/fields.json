@@ -33,16 +33,23 @@
     {
       "fieldName": "3. 適正な計量の実施(第10条~第18条)",
       "questions": [
-        { "edition": "75", "pageNum": "3" },
-        { "edition": "75", "pageNum": "4" },
-        { "edition": "74", "pageNum": "3" },
-        { "edition": "74", "pageNum": "4" },
-        { "edition": "73", "pageNum": "3" },
-        { "edition": "73", "pageNum": "4" },
-        { "edition": "72", "pageNum": "3" },
-        { "edition": "72", "pageNum": "4" },
-        { "edition": "71", "pageNum": "3" },
-        { "edition": "71", "pageNum": "4" }
+        { "edition": "75", "pageNum": "5" },
+        { "edition": "75", "pageNum": "6" },
+        { "edition": "75", "pageNum": "7" },
+        { "edition": "74", "pageNum": "5" },
+        { "edition": "74", "pageNum": "6" },
+        { "edition": "74", "pageNum": "7" },
+        { "edition": "74", "pageNum": "10" },
+        { "edition": "73", "pageNum": "5" },
+        { "edition": "73", "pageNum": "6" },
+        { "edition": "73", "pageNum": "7" },
+        { "edition": "73", "pageNum": "11" },
+        { "edition": "72", "pageNum": "5" },
+        { "edition": "72", "pageNum": "6" },
+        { "edition": "72", "pageNum": "7" },
+        { "edition": "71", "pageNum": "5" },
+        { "edition": "71", "pageNum": "6" },
+        { "edition": "71", "pageNum": "7" }
       ]
     },
     {
