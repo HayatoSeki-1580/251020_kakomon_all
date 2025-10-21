@@ -18,8 +18,7 @@ const prevBtn = document.getElementById('prev-btn');
 const nextBtn = document.getElementById('next-btn');
 const resultArea = document.getElementById('result-area');
 const answerButtons = document.querySelectorAll('.answer-btn');
-const jumpToInput = document.getElementById('jump-to-input');
-const jumpToBtn = document.getElementById('jump-to-btn');
+const jumpToSelect = document.getElementById('jump-to-select');
 
 console.log("✅ HTML要素の取得完了");
 
@@ -59,7 +58,6 @@ async function setupEditionSelector() {
 async function loadAnswersForEdition(edition) {
     console.log(`🔄 loadAnswersForEdition 関数を開始: 第${edition}回`);
     const url = `./pdf/${edition}/${edition}_answer.json`;
-    console.log(`📄 解答ファイルを読み込みます: ${url}`);
     try {
         const response = await fetch(url);
         if (!response.ok) throw new Error(`HTTPエラー！ ステータス: ${response.status}`);
@@ -80,7 +78,6 @@ async function renderPdf() {
 
     currentPageNum = 1;
     const url = `./pdf/${currentEdition}/${currentEdition}_${currentSubject}.pdf`;
-    console.log(`📄 PDFを読み込みます: ${url}`);
     
     const loadingTaskOptions = {
         cMapUrl: './lib/pdfjs/web/cmaps/',
@@ -92,8 +89,11 @@ async function renderPdf() {
         const loadingTask = pdfjsLib.getDocument(url, loadingTaskOptions);
         pdfDoc = await loadingTask.promise;
         
-        console.log("📄 PDFの読み込み成功。総ページ数:", pdfDoc.numPages);
-        pageCountSpan.textContent = pdfDoc.numPages > 1 ? pdfDoc.numPages - 1 : 0;
+        const totalQuestions = pdfDoc.numPages > 1 ? pdfDoc.numPages - 1 : 0;
+        pageCountSpan.textContent = totalQuestions;
+        
+        populateJumpSelector(totalQuestions);
+
         await renderPage(currentPageNum);
     } catch (error) {
         console.error("❌ PDFの読み込みに失敗:", error);
@@ -101,14 +101,20 @@ async function renderPdf() {
     }
 }
 
+/** ジャンプ用プルダウンを生成する関数 */
+function populateJumpSelector(totalQuestions) {
+    jumpToSelect.innerHTML = '<option value="">移動...</option>';
+    for (let i = 1; i <= totalQuestions; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = `問${i}`;
+        jumpToSelect.appendChild(option);
+    }
+}
+
 /** 指定されたページを描画する */
 async function renderPage(num) {
-    if (!pdfDoc) {
-        console.warn("描画しようとしましたが、pdfDocがありません。");
-        return;
-    }
-    console.log(`🔄 ページを描画中: 問題${num} (PDFの${num + 1}ページ目)`);
-
+    if (!pdfDoc) return;
     try {
         const page = await pdfDoc.getPage(num + 1);
         const viewport = page.getViewport({ scale: 1.8 });
@@ -117,13 +123,13 @@ async function renderPage(num) {
         canvas.width = viewport.width;
         context.clearRect(0, 0, canvas.width, canvas.height);
         await page.render({ canvasContext: context, viewport }).promise;
+        
         pageNumSpan.textContent = num;
         resultArea.textContent = '';
         updateNavButtons();
-        console.log("✅ ページ描画完了");
+        jumpToSelect.value = num;
     } catch (error) {
-        console.error("❌ ページ描画中に致命的なエラーが発生しました:", error);
-        alert("ページの描画中にエラーが発生しました。コンソールを確認してください。");
+        console.error("❌ ページ描画中にエラー:", error);
     }
 }
 
@@ -135,10 +141,10 @@ function checkAnswer(selectedChoice) {
         return;
     }
     if (parseInt(selectedChoice, 10) === correctAnswer) {
-        resultArea.textContent = `問${currentPageNum}: 正解！ 🎉`;
+        resultArea.textContent = `正解！ 🎉`;
         resultArea.className = 'correct';
     } else {
-        resultArea.textContent = `問${currentPageNum}: 不正解... (正解は ${correctAnswer}) ❌`;
+        resultArea.textContent = `不正解... (正解は ${correctAnswer}) ❌`;
         resultArea.className = 'incorrect';
     }
 }
@@ -174,18 +180,11 @@ answerButtons.forEach(button => {
     button.addEventListener('click', (e) => { checkAnswer(e.target.dataset.choice); });
 });
 
-jumpToBtn.addEventListener('click', () => {
-    if (!pdfDoc) return;
-    const totalQuestions = pdfDoc.numPages - 1;
-    const targetPage = parseInt(jumpToInput.value, 10);
-
-    if (targetPage >= 1 && targetPage <= totalQuestions) {
-        console.log(`🔘 移動ボタンクリック: ${targetPage}へジャンプ`);
+jumpToSelect.addEventListener('change', (e) => {
+    const targetPage = parseInt(e.target.value, 10);
+    if (targetPage) {
         currentPageNum = targetPage;
         renderPage(currentPageNum);
-        jumpToInput.value = "";
-    } else {
-        alert(`1から${totalQuestions}の間の数字を入力してください。`);
     }
 });
 
@@ -206,3 +205,4 @@ async function initialize() {
 
 // --- アプリケーションの実行 ---
 initialize();
+
