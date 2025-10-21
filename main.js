@@ -3,7 +3,8 @@ console.log("✅ main.js スクリプトの読み込み開始");
 
 // --- モジュールのインポート ---
 import * as pdfjsLib from './lib/pdfjs/build/pdf.mjs';
-pdfjsLib.GlobalWorkerOptions.workerSrc = './lib.pdfjs/build/pdf.worker.mjs';
+// 【重要】ここのパスを修正しました！
+pdfjsLib.GlobalWorkerOptions.workerSrc = './lib/pdfjs/build/pdf.worker.mjs';
 
 console.log("✅ PDF.jsライブラリのインポート成功");
 
