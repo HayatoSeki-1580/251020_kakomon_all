@@ -2,10 +2,8 @@
 console.log("✅ main.js スクリプトの読み込み開始");
 
 // --- モジュールのインポート ---
-// ここで失敗する場合、コンソールに 'Failed to resolve module specifier' のようなエラーが出ます。
-// パスが './lib/pdfjs/build/pdf.mjs' であることを確認してください。
 import * as pdfjsLib from './lib/pdfjs/build/pdf.mjs';
-pdfjsLib.GlobalWorkerOptions.workerSrc = './lib/pdfjs/build/pdf.worker.mjs';
+pdfjsLib.GlobalWorkerOptions.workerSrc = './lib.pdfjs/build/pdf.worker.mjs';
 
 console.log("✅ PDF.jsライブラリのインポート成功");
 
@@ -54,7 +52,6 @@ async function setupEditionSelector() {
         currentEdition = editionSelect.value;
         console.log(`✅ プルダウンを生成完了。現在の選択: 第${currentEdition}回`);
     } catch (error) {
-        // ここでエラーが出た場合、editions.jsonのパスや中身が間違っています。
         console.error("❌ setupEditionSelector 関数で致命的なエラー:", error);
         alert('editions.jsonの読み込みに失敗しました。コンソールを確認してください。');
     }
@@ -63,7 +60,6 @@ async function setupEditionSelector() {
 /** 指定された回の解答JSONを読み込む */
 async function loadAnswersForEdition(edition) {
     console.log(`🔄 loadAnswersForEdition 関数を開始: 第${edition}回`);
-    // ファイル名の規則： 75_answer.json
     const url = `./pdf/${edition}/${edition}_answer.json`;
     console.log(`📄 解答ファイルを読み込みます: ${url}`);
     try {
@@ -85,8 +81,8 @@ async function renderPdf() {
     console.log(`🔄 renderPdf 関数を開始: 第${currentEdition}回 / ${currentSubject}`);
     const context = canvas.getContext('2d');
     context.clearRect(0, 0, canvas.width, canvas.height);
+
     currentPageNum = 1;
-    // ファイル名の規則： 75_kanka.pdf
     const url = `./pdf/${currentEdition}/${currentEdition}_${currentSubject}.pdf`;
     console.log(`📄 PDFを読み込みます: ${url}`);
     try {
@@ -102,9 +98,59 @@ async function renderPdf() {
 
 /** 指定されたページを描画する */
 async function renderPage(num) {
+    if (!pdfDoc) {
+        console.warn("描画しようとしましたが、pdfDocがありません。");
+        return;
+    }
     console.log(`🔄 ページを描画中: 問題${num} (PDFの${num + 1}ページ目)`);
-    // ... (この中の処理は変更なし)
+
+    try {
+        const page = await pdfDoc.getPage(num + 1);
+        const viewport = page.getViewport({ scale: 1.8 });
+        const context = canvas.getContext('2d');
+
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        await page.render({ canvasContext: context, viewport }).promise;
+
+        pageNumSpan.textContent = num;
+        resultArea.textContent = '';
+        updateNavButtons();
+        console.log("✅ ページ描画完了");
+
+    } catch (error) {
+        console.error("❌ ページ描画中に致命的なエラーが発生しました:", error);
+        alert("ページの描画中にエラーが発生しました。コンソールを確認してください。");
+    }
 }
+
+/** 正誤を判定して結果を表示する */
+function checkAnswer(selectedChoice) {
+    console.log(`🔘 解答ボタンクリック: ${selectedChoice}番`);
+    const correctAnswer = currentAnswers?.[currentSubject]?.[currentPageNum];
+    if (correctAnswer === undefined) {
+        resultArea.textContent = 'この問題の解答データがありません。';
+        return;
+    }
+    if (parseInt(selectedChoice, 10) === correctAnswer) {
+        resultArea.textContent = `問${currentPageNum}: 正解！ 🎉`;
+        resultArea.className = 'correct';
+    } else {
+        resultArea.textContent = `問${currentPageNum}: 不正解... (正解は ${correctAnswer}) ❌`;
+        resultArea.className = 'incorrect';
+    }
+}
+
+/** ナビゲーションボタンの有効/無効を更新 */
+function updateNavButtons() {
+    const totalQuestions = pdfDoc ? pdfDoc.numPages - 1 : 0;
+    prevBtn.disabled = (currentPageNum <= 1);
+    nextBtn.disabled = (currentPageNum >= totalQuestions);
+}
+
 
 // --- イベントリスナーの設定 ---
 console.log("🔄 イベントリスナーを設定します");
@@ -125,37 +171,13 @@ goBtn.addEventListener('click', async () => {
     await renderPdf();
 });
 
-// ... (他のイベントリスナーや関数は、デバッグメッセージ以外は変更なし) ...
-// (念のため、省略せず全コードを記載します)
-
-function checkAnswer(selectedChoice) {
-    console.log(`🔘 解答ボタンクリック: ${selectedChoice}番`);
-    const correctAnswer = currentAnswers?.[currentSubject]?.[currentPageNum];
-    if (correctAnswer === undefined) {
-        resultArea.textContent = 'この問題の解答データがありません。';
-        return;
-    }
-    if (parseInt(selectedChoice, 10) === correctAnswer) {
-        resultArea.textContent = `問${currentPageNum}: 正解！ 🎉`;
-        resultArea.className = 'correct';
-    } else {
-        resultArea.textContent = `問${currentPageNum}: 不正解... (正解は ${correctAnswer}) ❌`;
-        resultArea.className = 'incorrect';
-    }
-}
-
-function updateNavButtons() {
-    const totalQuestions = pdfDoc ? pdfDoc.numPages - 1 : 0;
-    prevBtn.disabled = (currentPageNum <= 1);
-    nextBtn.disabled = (currentPageNum >= totalQuestions);
-}
-
 prevBtn.addEventListener('click', () => {
     if (currentPageNum > 1) {
         currentPageNum--;
         renderPage(currentPageNum);
     }
 });
+
 nextBtn.addEventListener('click', () => {
     const totalQuestions = pdfDoc ? pdfDoc.numPages - 1 : 0;
     if (currentPageNum < totalQuestions) {
@@ -163,6 +185,7 @@ nextBtn.addEventListener('click', () => {
         renderPage(currentPageNum);
     }
 });
+
 answerButtons.forEach(button => {
     button.addEventListener('click', (e) => {
         checkAnswer(e.target.dataset.choice);
