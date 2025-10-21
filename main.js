@@ -125,7 +125,6 @@ goBtn.addEventListener('click', async () => {
 
 // ... (他のイベントリスナーや関数は、デバッグメッセージ以外は変更なし) ...
 // (念のため、省略せず全コードを記載します)
-}
 
 function checkAnswer(selectedChoice) {
     console.log(`🔘 解答ボタンクリック: ${selectedChoice}番`);
