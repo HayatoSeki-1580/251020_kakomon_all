@@ -339,43 +339,83 @@
     {
         "fieldName": "8. 校正方法とSN比",
       "questions": [
-        { "edition": "75", "pageNum": "3" }
+        { "edition": "75", "pageNum": "13" },
+        { "edition": "75", "pageNum": "14" },
+        { "edition": "75", "pageNum": "15" },
+        { "edition": "75", "pageNum": "16" },
+        { "edition": "74", "pageNum": "3" },
+        { "edition": "74", "pageNum": "13" },
+        { "edition": "74", "pageNum": "14" },
+        { "edition": "74", "pageNum": "15" },
+        { "edition": "74", "pageNum": "16" },
+        { "edition": "73", "pageNum": "13" },
+        { "edition": "73", "pageNum": "14" },
+        { "edition": "73", "pageNum": "15" },
+        { "edition": "72", "pageNum": "13" },
+        { "edition": "72", "pageNum": "14" },
+        { "edition": "72", "pageNum": "15" },
+        { "edition": "71", "pageNum": "13" },
+        { "edition": "71", "pageNum": "14" },
+        { "edition": "71", "pageNum": "15" },
+        { "edition": "71", "pageNum": "16" },
       ]
     },
     {
         "fieldName": "9. 管理図",
       "questions": [
-        { "edition": "75", "pageNum": "3" }
+        { "edition": "75", "pageNum": "24" },
+        { "edition": "72", "pageNum": "24" },
+        { "edition": "71", "pageNum": "23" }
       ]
     },
     {
         "fieldName": "10. サンプリング",
       "questions": [
-        { "edition": "75", "pageNum": "3" }
+        { "edition": "72", "pageNum": "22" }
       ]
     },
     {
         "fieldName": "11. 検査",
       "questions": [
-        { "edition": "75", "pageNum": "3" }
+        { "edition": "75", "pageNum": "22" },
+        { "edition": "74", "pageNum": "22" },
+        { "edition": "73", "pageNum": "22" },
+        { "edition": "71", "pageNum": "22" }
       ]
     },
     {
         "fieldName": "12. 信頼性",
       "questions": [
-        { "edition": "75", "pageNum": "3" }
+        { "edition": "75", "pageNum": "20" },
+        { "edition": "74", "pageNum": "20" },
+        { "edition": "73", "pageNum": "20" },
+        { "edition": "72", "pageNum": "20" },
+        { "edition": "71", "pageNum": "20" }
       ]
     },
     {
         "fieldName": "13. 自動制御",
       "questions": [
-        { "edition": "75", "pageNum": "3" }
+        { "edition": "75", "pageNum": "17" },
+        { "edition": "74", "pageNum": "17" },
+        { "edition": "73", "pageNum": "17" },
+        { "edition": "72", "pageNum": "17" },
+        { "edition": "71", "pageNum": "17" }
       ]
     },
     {
         "fieldName": "14. 計算機・信号伝達",
       "questions": [
-        { "edition": "75", "pageNum": "3" }
+        { "edition": "75", "pageNum": "18" },
+        { "edition": "74", "pageNum": "19" },
+        { "edition": "73", "pageNum": "18" },
+        { "edition": "72", "pageNum": "19" },
+        { "edition": "71", "pageNum": "18" },
+        { "edition": "75", "pageNum": "19" },
+        { "edition": "74", "pageNum": "18" },
+        { "edition": "73", "pageNum": "19" },
+        { "edition": "72", "pageNum": "18" },
+        { "edition": "71", "pageNum": "19" }
       ]
     }
   ]
