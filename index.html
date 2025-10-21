@@ -14,7 +14,7 @@
             <div class="select-group">
                 <label for="subject-select">科目:</label>
                 <select id="subject-select">
-                    <option value="kanka">環化</option>
+                <option value="kanka">環化</option>
                 <option value="kanbutsu">環物</option>
                 <option value="kannou">環濃</option>
                 <option value="kanon">環音</option>
@@ -22,7 +22,6 @@
                 <option value="kanri">管理</option>
                 <option value="ichiki">一基</option>
                 <option value="keishitsu">計質</option>
-                    <!-- 他の科目も同様に -->
                 </select>
             </div>
             <div class="select-group">
@@ -32,12 +31,16 @@
             <button id="go-btn">表示</button>
         </div>
         <div class="actions-row">
-            <div class="answer-buttons">
-                <button class="answer-btn" data-choice="1">1</button>
-                <button class="answer-btn" data-choice="2">2</button>
-                <button class="answer-btn" data-choice="3">3</button>
-                <button class="answer-btn" data-choice="4">4</button>
-                <button class="answer-btn" data-choice="5">5</button>
+            <!-- 【追加】解答ラベルとボタンをグループ化 -->
+            <div class="answer-group">
+                <span class="answer-label">解答:</span>
+                <div class="answer-buttons">
+                    <button class="answer-btn" data-choice="1">1</button>
+                    <button class="answer-btn" data-choice="2">2</button>
+                    <button class="answer-btn" data-choice="3">3</button>
+                    <button class="answer-btn" data-choice="4">4</button>
+                    <button class="answer-btn" data-choice="5">5</button>
+                </div>
             </div>
             <div id="result-area"></div>
         </div>
@@ -47,16 +50,21 @@
         <button id="prev-btn">◀ 前の問題</button>
         <span id="page-indicator">問 <span id="page-num">?</span> / <span id="page-count">?</span></span>
         <button id="next-btn">次の問題 ▶</button>
-        <!-- ジャンプ機能をプルダウンに変更 -->
         <select id="jump-to-select" class="jump-select">
             <option value="">移動...</option>
         </select>
     </div>
 
     <div class="viewer-container">
+        <!-- 【追加】初期表示用のウェルカムメッセージ -->
+        <div id="welcome-overlay">
+            <h2>過去問演習へようこそ！</h2>
+            <p>学習したい科目と実施回を選択して「表示」ボタンを押してください。</p>
+        </div>
         <canvas id="pdf-canvas"></canvas>
     </div>
 
     <script src="main.js" type="module"></script>
 </body>
 </html>
+
