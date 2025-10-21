@@ -146,4 +146,59 @@ async function renderPage(num) {
 
 function checkAnswer(selectedChoice) {
     console.log(`🔘 解答ボタンクリック: ${selectedChoice}番`);
-    const correctAnswer = currentAnswers?
+    const correctAnswer = currentAnswers?.[currentSubject]?.[currentPageNum];
+    if (correctAnswer === undefined) {
+        resultArea.textContent = 'この問題の解答データがありません。';
+        return;
+    }
+    if (parseInt(selectedChoice, 10) === correctAnswer) {
+        resultArea.textContent = `問${currentPageNum}: 正解！ 🎉`;
+        resultArea.className = 'correct';
+    } else {
+        resultArea.textContent = `問${currentPageNum}: 不正解... (正解は ${correctAnswer}) ❌`;
+        resultArea.className = 'incorrect';
+    }
+}
+
+function updateNavButtons() {
+    const totalQuestions = pdfDoc ? pdfDoc.numPages - 1 : 0;
+    prevBtn.disabled = (currentPageNum <= 1);
+    nextBtn.disabled = (currentPageNum >= totalQuestions);
+}
+
+prevBtn.addEventListener('click', () => {
+    if (currentPageNum > 1) {
+        currentPageNum--;
+        renderPage(currentPageNum);
+    }
+});
+nextBtn.addEventListener('click', () => {
+    const totalQuestions = pdfDoc ? pdfDoc.numPages - 1 : 0;
+    if (currentPageNum < totalQuestions) {
+        currentPageNum++;
+        renderPage(currentPageNum);
+    }
+});
+answerButtons.forEach(button => {
+    button.addEventListener('click', (e) => {
+        checkAnswer(e.target.dataset.choice);
+    });
+});
+
+/** 初期化処理 */
+async function initialize() {
+    console.log("🔄 アプリケーションの初期化を開始...");
+    await setupEditionSelector();
+    if (currentEdition) {
+        const context = canvas.getContext('2d');
+        context.font = "20px sans-serif";
+        context.textAlign = "center";
+        context.fillText("科目と実施回を選択して「表示」ボタンを押してください。", canvas.width / 2, 50);
+        console.log("✅ 初期化完了。ユーザーの操作を待っています。");
+    } else {
+        console.error("❌ 初期化に失敗。利用可能な実施回がありません。");
+    }
+}
+
+// --- アプリケーションの実行 ---
+initialize();
