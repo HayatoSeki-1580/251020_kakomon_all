@@ -71,6 +71,7 @@ async function loadAnswersForEdition(edition) {
 }
 
 /** PDFを読み込んで表示する */
+/** PDFを読み込んで表示する */
 async function renderPdf() {
     console.log(`🔄 renderPdf 関数を開始: 第${currentEdition}回 / ${currentSubject}`);
     const context = canvas.getContext('2d');
@@ -80,7 +81,7 @@ async function renderPdf() {
     const url = `./pdf/${currentEdition}/${currentEdition}_${currentSubject}.pdf`;
     console.log(`📄 PDFを読み込みます: ${url}`);
     
-    // 【最重要】PDF読み込み設定オブジェクト
+    // 【最重要】この設定オブジェクトで、CMapの場所を教えます
     const loadingTaskOptions = {
         cMapUrl: './lib/pdfjs/web/cmaps/',
         cMapPacked: true,
@@ -88,6 +89,7 @@ async function renderPdf() {
     };
 
     try {
+        // 準備した設定を使ってPDFを読み込みます
         const loadingTask = pdfjsLib.getDocument(url, loadingTaskOptions);
         pdfDoc = await loadingTask.promise;
         
