@@ -134,7 +134,11 @@ function populateJumpSelector(totalQuestions) {
 
 /** 指定されたページを描画する */
 async function renderPage(num) {
-    if (!pdfDoc) return;
+    if (!pdfDoc) {
+        console.warn("描画しようとしましたが、pdfDocがありません。");
+        return;
+    }
+    console.log(`🔄 ページを描画中: 問題${num} (PDFの${num + 1}ページ目)`);
     try {
         answerButtons.forEach(btn => btn.classList.remove('selected'));
         const page = await pdfDoc.getPage(num + 1);
@@ -149,9 +153,19 @@ async function renderPage(num) {
             // 分野別モード
             const question = currentFieldQuestions[currentFieldIndex];
             pageNumSpan.textContent = currentFieldIndex + 1;
-            // 出典情報を表示
-            questionSource.textContent = `出典: 第${question.edition}回 問${question.pageNum}`;
+
+            // 【修正】editionSelectから対応する表示テキストを探す
+            let editionDisplayText = `第${question.edition}回`; // デフォルト値
+            for (let i = 0; i < editionSelect.options.length; i++) {
+                if (editionSelect.options[i].value === question.edition) {
+                    editionDisplayText = editionSelect.options[i].textContent;
+                    break;
+                }
+            }
+            // 新しい形式で出典情報を表示
+            questionSource.textContent = `出典: ${editionDisplayText} 問${question.pageNum}`;
             questionSource.style.display = 'inline'; // 表示
+
         } else {
             // 回数別モード
             pageNumSpan.textContent = num;
@@ -161,8 +175,16 @@ async function renderPage(num) {
         resultAreaEdition.textContent = '';
         resultAreaField.textContent = '';
         updateNavButtons();
-        jumpToSelect.value = num;
-    } catch (error) { console.error("❌ ページ描画エラー:", error); }
+        // 回数別モードの時だけジャンププルダウンの値を更新
+        if (currentFieldQuestions.length === 0) {
+            jumpToSelect.value = num;
+        }
+
+        console.log("✅ ページ描画完了");
+    } catch (error) {
+        console.error("❌ ページ描画エラー:", error);
+        alert("ページの描画中にエラーが発生しました。コンソールを確認してください。");
+    }
 }
 
 /** 分野別プルダウンを生成する */
