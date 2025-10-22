@@ -100,6 +100,7 @@ select { /* 標準のselectタグのスタイル */
     border: 5px solid transparent;
     border-color: #555 transparent transparent transparent;
     margin-left: 10px;
+    flex-shrink: 0; /* 矢印が縮まないように */
 }
 .select-selected.select-arrow-active:after {
     border-color: transparent transparent #555 transparent;
@@ -127,11 +128,17 @@ select { /* 標準のselectタグのスタイル */
     padding: 0.6em 0.8em; /* padding調整 */
     border-bottom: 1px solid #eee; /* 区切り線 */
     cursor: pointer;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    /* white-space: nowrap; */ /* ← 折り返しのために削除 */
+    /* overflow: hidden; */   /* ← 折り返しのために削除 */
+    /* text-overflow: ellipsis; */ /* ← 折り返しのために削除 */
     font-family: Consolas, "Courier New", monospace;
     transition: background-color 0.1s ease; /* ホバー効果を滑らかに */
+    gap: 0.5em; /* テキストとバーの間隔 */
+}
+.select-items div span:first-child { /* テキスト部分 */
+    flex-grow: 1; /* テキストが可能な限り幅を取る */
+    white-space: normal; /* 折り返しを許可 */
+    overflow-wrap: break-word; /* 長い単語でも折り返す */
 }
 .select-items div:last-child {
     border-bottom: none; /* 最後の要素の下線は消す */
@@ -154,15 +161,22 @@ select { /* 標準のselectタグのスタイル */
 }
 
 .same-as-selected { /* 現在選択中の項目を少し強調 */
-    background-color: #f8f9fa;
+    background-color: #f8f9fa !important; /* !importantでホバーより優先 */
+    color: #333 !important;
     font-weight: bold;
+}
+.same-as-selected .freq-bar-container {
+     background-color: #e9ecef !important;
+}
+.same-as-selected .freq-bar {
+     opacity: 1 !important;
 }
 
 
 /* ======== 頻出度バー（右揃え・ヒートマップ）のスタイル (改善版) ======== */
 .freq-bar-container {
-    margin-left: 1em;
-    width: 60px;
+    margin-left: auto; /* 自動で右端に寄せる */
+    width: 50px; /* バーエリアの幅を少し狭く */
     height: 10px; /* 高さを少し低く */
     background-color: #e9ecef; /* バーの背景色を少し濃く */
     border-radius: 2px;
