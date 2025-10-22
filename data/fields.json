@@ -549,5 +549,89 @@
         { "edition": "71", "pageNum": "19" }
       ]
     }
+  ],
+  "ichiki": [
+  {
+      "fieldName": "test1",
+      "questions": [
+        { "edition": "75", "pageNum": "1" },
+        { "edition": "74", "pageNum": "1" },
+        { "edition": "73", "pageNum": "1" },
+        { "edition": "72", "pageNum": "1" },
+        { "edition": "71", "pageNum": "1" }
+      ]
+    },  
+  {
+      "fieldName": "test2",
+      "questions": [
+        { "edition": "75", "pageNum": "2" },
+        { "edition": "75", "pageNum": "3" },
+        { "edition": "74", "pageNum": "2" },
+        { "edition": "74", "pageNum": "3" },
+        { "edition": "73", "pageNum": "2" },
+        { "edition": "73", "pageNum": "3" },
+        { "edition": "72", "pageNum": "2" },
+        { "edition": "72", "pageNum": "3" },
+        { "edition": "71", "pageNum": "2" },
+        { "edition": "71", "pageNum": "3" }
+      ]
+    },
+  {
+      "fieldName": "test3",
+      "questions": [
+        { "edition": "75", "pageNum": "4" },
+        { "edition": "75", "pageNum": "5" },
+        { "edition": "74", "pageNum": "4" },
+        { "edition": "74", "pageNum": "5" },
+        { "edition": "73", "pageNum": "4" },
+        { "edition": "73", "pageNum": "5" },
+        { "edition": "72", "pageNum": "4" },
+        { "edition": "72", "pageNum": "5" },
+        { "edition": "71", "pageNum": "4" },
+        { "edition": "71", "pageNum": "5" }
+      ]
+    }
+  ],
+  "keishitsu": [
+  {
+      "fieldName": "test1,
+      "questions": [
+        { "edition": "75", "pageNum": "1" },
+        { "edition": "74", "pageNum": "1" },
+        { "edition": "73", "pageNum": "1" },
+        { "edition": "72", "pageNum": "1" },
+        { "edition": "71", "pageNum": "1" }
+      ]
+    },  
+  {
+      "fieldName": "test2",
+      "questions": [
+        { "edition": "75", "pageNum": "2" },
+        { "edition": "75", "pageNum": "3" },
+        { "edition": "74", "pageNum": "2" },
+        { "edition": "74", "pageNum": "3" },
+        { "edition": "73", "pageNum": "2" },
+        { "edition": "73", "pageNum": "3" },
+        { "edition": "72", "pageNum": "2" },
+        { "edition": "72", "pageNum": "3" },
+        { "edition": "71", "pageNum": "2" },
+        { "edition": "71", "pageNum": "3" }
+      ]
+    },
+  {
+      "fieldName": "test3",
+      "questions": [
+        { "edition": "75", "pageNum": "4" },
+        { "edition": "75", "pageNum": "5" },
+        { "edition": "74", "pageNum": "4" },
+        { "edition": "74", "pageNum": "5" },
+        { "edition": "73", "pageNum": "4" },
+        { "edition": "73", "pageNum": "5" },
+        { "edition": "72", "pageNum": "4" },
+        { "edition": "72", "pageNum": "5" },
+        { "edition": "71", "pageNum": "4" },
+        { "edition": "71", "pageNum": "5" }
+      ]
+    }
   ]
 }
