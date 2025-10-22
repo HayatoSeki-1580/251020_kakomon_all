@@ -257,12 +257,12 @@
     {
       "fieldName": "JIS",
       "questions": [
-        { "edition": "75", "pageNum": "1" },
-        { "edition": "75", "pageNum": "2" },
-        { "edition": "75", "pageNum": "3" },
-        { "edition": "75", "pageNum": "4" },
-        { "edition": "75", "pageNum": "5" },
-        
+        { "edition": "75", "pageNum": "7" },
+        { "edition": "75", "pageNum": "8" },
+        { "edition": "75", "pageNum": "9" },
+        { "edition": "75", "pageNum": "11" },
+        { "edition": "75", "pageNum": "14" },
+        { "edition": "75", "pageNum": "24" },
         { "edition": "74", "pageNum": "7" },
         { "edition": "74", "pageNum": "8" },
         { "edition": "74", "pageNum": "9" },
@@ -272,7 +272,6 @@
         { "edition": "74", "pageNum": "21" },
         { "edition": "74", "pageNum": "22" },
         { "edition": "74", "pageNum": "24" },
-        
         { "edition": "73", "pageNum": "7" },
         { "edition": "73", "pageNum": "9" },
         { "edition": "73", "pageNum": "11" },
