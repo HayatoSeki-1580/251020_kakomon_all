@@ -7,6 +7,7 @@ const exerciseView = document.getElementById('exercise-view');
 const resultsPanel = document.getElementById('results-panel');
 const welcomeOverlay = document.getElementById('welcome-overlay');
 const canvas = document.getElementById('pdf-canvas');
+const loadingSpinner = document.getElementById('loading-spinner');
 const pageNumSpan = document.getElementById('page-num');
 const pageCountSpan = document.getElementById('page-count');
 const prevBtn = document.getElementById('prev-btn');
@@ -42,8 +43,15 @@ let fieldsData = {};
 let currentFieldQuestions = [];
 let currentFieldIndex = 0;
 let correctCount = 0;
-let answerHistory = {}; // { questionId: { selected: firstChoice, correct: isFirstChoiceCorrect, correctAnswer: actualCorrectAnswer } }
-let currentSessionQuestions = []; // 表示ボタンが押された時点の問題リスト全体
+let answerHistory = {};
+let currentSessionQuestions = [];
+let currentSubject = subjectSelectEdition.value; // 初期値
+let currentEdition = ''; // 初期値
+
+/** ローディング表示を制御する関数 */
+function showLoading(show) {
+    loadingSpinner.classList.toggle('hidden', !show);
+}
 
 /** 問題IDを生成するヘルパー関数 */
 function getQuestionId(edition, subject, pageNum) {
@@ -66,7 +74,7 @@ async function setupEditionSelector() {
             editionSelect.appendChild(option);
         });
         if (editionSelect.options.length > 0) {
-            // currentEdition は goBtnEdition クリック時に設定する
+            // currentEdition は goBtnEdition クリック時に設定
         }
     } catch (error) { console.error("❌ editions.json読込エラー:", error); }
 }
@@ -99,11 +107,14 @@ async function renderPdf(edition, subject, pageNum = 1) {
     currentPageNum = pageNum;
     const url = `./pdf/${edition}/${edition}_${subject}.pdf`;
     const loadingTaskOptions = { cMapUrl: './lib/pdfjs/web/cmaps/', cMapPacked: true, standardFontDataUrl: './lib/pdfjs/web/standard_fonts/' };
+
+    showLoading(true); // ローディング表示開始
+
     try {
         const loadingTask = pdfjsLib.getDocument(url, loadingTaskOptions);
         pdfDoc = await loadingTask.promise;
         const totalQuestions = pdfDoc.numPages > 1 ? pdfDoc.numPages - 1 : 0;
-        if (currentFieldQuestions.length === 0) { // 回数別モードの時のみ更新
+        if (currentFieldQuestions.length === 0) {
             pageCountSpan.textContent = totalQuestions;
             populateJumpSelector(totalQuestions);
         }
@@ -117,6 +128,8 @@ async function renderPdf(edition, subject, pageNum = 1) {
         pageNumSpan.textContent = '0';
         populateJumpSelector(0);
         questionSource.style.display = 'none';
+    } finally {
+        showLoading(false); // ローディング表示終了
     }
 }
 
@@ -137,7 +150,7 @@ async function renderPage(num) {
     try {
         answerButtons.forEach(btn => {
             btn.classList.remove('selected', 'incorrect-first', 'disabled');
-            btn.disabled = false; // 一旦有効化
+            btn.disabled = false;
         });
 
         const page = await pdfDoc.getPage(num + 1);
@@ -262,52 +275,34 @@ function checkAnswer(selectedChoice) {
     const questionId = getQuestionId(questionEdition, questionSubject, questionPageNum);
     const resultArea = currentFieldQuestions.length > 0 ? resultAreaField : resultAreaEdition;
 
-    // 既に解答履歴があれば何もしない
-    if (answerHistory[questionId]) {
-        console.log(`📝 解答済みのため無視: ${questionId}`);
-        return;
-    }
+    if (answerHistory[questionId]) { return; } // 解答済み
 
     const correctAnswer = currentAnswers?.[questionSubject]?.[questionPageNum];
 
     if (correctAnswer === undefined) {
         resultArea.textContent = '解答データがありません。';
         resultArea.className = 'result-area';
-        // 解答データがない場合も履歴を残し、ボタンを無効化
-        answerHistory[questionId] = { selected: selectedChoice, correct: null, correctAnswer: '?' }; // 正解不明
+        answerHistory[questionId] = { selected: selectedChoice, correct: null, correctAnswer: '?' };
         answerButtons.forEach(btn => { btn.disabled = true; btn.classList.add('disabled'); });
         return;
     }
 
     const isCorrect = parseInt(selectedChoice, 10) === correctAnswer;
-
-    // 解答履歴を記録
     answerHistory[questionId] = { selected: selectedChoice, correct: isCorrect, correctAnswer: correctAnswer };
-    console.log(`📝 解答を記録: ${questionId}`, answerHistory[questionId]);
 
-    // 正解の場合のみスコア加算
     if (isCorrect) {
         correctCount++;
         updateScoreDisplay();
-        console.log(`✅ 正解！ スコア: ${correctCount}`);
         resultArea.textContent = `正解！ 🎉`;
         resultArea.className = 'result-area correct';
     } else {
-        console.log(`❌ 不正解...`);
         resultArea.textContent = `不正解... (正解は ${correctAnswer}) ❌`;
         resultArea.className = 'result-area incorrect';
-        // 不正解だったボタンにマーク
         const selectedButton = document.querySelector(`.answer-btn[data-choice="${selectedChoice}"]`);
-        if (selectedButton) {
-            selectedButton.classList.add('incorrect-first');
-        }
+        if (selectedButton) selectedButton.classList.add('incorrect-first');
     }
 
-    // 解答後はボタンを無効化
-    answerButtons.forEach(btn => {
-        btn.disabled = true;
-        btn.classList.add('disabled');
-    });
+    answerButtons.forEach(btn => { btn.disabled = true; btn.classList.add('disabled'); });
 }
 
 /** ナビゲーションボタンの有効/無効を更新 */
@@ -326,41 +321,24 @@ function updateNavButtons() {
 
 /** 成績ページを生成して表示する */
 function showResults() {
-    console.log("📊 成績ページを表示");
     exerciseView.classList.add('hidden');
     resultsPanel.classList.remove('hidden');
     window.scrollTo(0, 0);
 
     const totalQuestions = currentSessionQuestions.length;
     let answeredCount = 0;
-    let sessionCorrectCount = 0; // このセッションでの最終的な正答数
+    let sessionCorrectCount = 0;
 
-    resultsList.innerHTML = ''; // リストをクリア
+    resultsList.innerHTML = '';
     const table = document.createElement('table');
-    table.innerHTML = `
-        <thead>
-            <tr>
-                <th>問題</th>
-                <th>結果</th>
-                <th>あなたの解答</th>
-                <th>正解</th>
-                <th>復習</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    `;
+    table.innerHTML = `<thead><tr><th>問題</th><th>結果</th><th>あなたの解答</th><th>正解</th><th>復習</th></tr></thead><tbody></tbody>`;
     const tbody = table.querySelector('tbody');
 
     currentSessionQuestions.forEach((qInfo, index) => {
         const questionId = getQuestionId(qInfo.edition, qInfo.subject, qInfo.pageNum);
         const history = answerHistory[questionId];
         const tr = document.createElement('tr');
-
-        // 問題番号の表示をモードによって切り替え
-        const questionNumDisplay = (currentFieldQuestions.length > 0)
-            ? `${index + 1} (第${qInfo.edition}回 問${qInfo.pageNum})` // 分野別: 連番 + 出典
-            : `問 ${qInfo.pageNum}`; // 回数別: 問番号のみ
-
+        const questionNumDisplay = (currentFieldQuestions.length > 0) ? `${index + 1} (第${qInfo.edition}回 問${qInfo.pageNum})` : `問 ${qInfo.pageNum}`;
         let statusText = '未解答';
         let statusClass = '';
         let yourAnswer = '-';
@@ -369,58 +347,32 @@ function showResults() {
         if (history) {
             answeredCount++;
             yourAnswer = history.selected;
-            correctAnswer = history.correctAnswer; // 履歴から取得
-            if (history.correct === null) { // 解答データがなかった場合
-                 statusText = '不明';
-                 statusClass = '';
-                 yourAnswer = history.selected; // 選んだ番号は表示
-            } else if (history.correct) {
-                sessionCorrectCount++;
-                statusText = '正解';
-                statusClass = 'result-status-correct';
-            } else {
-                statusText = '不正解';
-                statusClass = 'result-status-incorrect';
-            }
+            correctAnswer = history.correctAnswer;
+            if (history.correct === null) { statusText = '不明'; }
+            else if (history.correct) { sessionCorrectCount++; statusText = '正解'; statusClass = 'result-status-correct'; }
+            else { statusText = '不正解'; statusClass = 'result-status-incorrect'; }
         }
 
-        tr.innerHTML = `
-            <td>${questionNumDisplay}</td>
-            <td class="${statusClass}">${statusText}</td>
-            <td>${yourAnswer}</td>
-            <td>${correctAnswer}</td>
-            <td><button class="review-btn" data-index="${index}">解き直す</button></td>
-        `;
+        tr.innerHTML = `<td>${questionNumDisplay}</td><td class="${statusClass}">${statusText}</td><td>${yourAnswer}</td><td>${correctAnswer}</td><td><button class="review-btn" data-index="${index}">解き直す</button></td>`;
         tbody.appendChild(tr);
     });
 
     resultsList.appendChild(table);
 
-    // 要約を表示
     const accuracy = totalQuestions > 0 ? ((sessionCorrectCount / totalQuestions) * 100).toFixed(1) : 0;
-    resultsSummary.innerHTML = `
-        総問題数: ${totalQuestions}問 / 解答済み: ${answeredCount}問<br>
-        正答数: ${sessionCorrectCount}問 / 正答率: ${accuracy}%
-    `;
+    resultsSummary.innerHTML = `総問題数: ${totalQuestions}問 / 解答済み: ${answeredCount}問<br>正答数: ${sessionCorrectCount}問 / 正答率: ${accuracy}%`;
 
-    // 復習ボタンにイベントリスナーを追加
     document.querySelectorAll('.review-btn').forEach(button => {
         button.addEventListener('click', (e) => {
             const index = parseInt(e.target.dataset.index, 10);
             const questionInfo = currentSessionQuestions[index];
-
-            resultsPanel.classList.add('hidden'); // 成績パネルを隠す
-            exerciseView.classList.remove('hidden'); // 演習パネルを表示
-
+            resultsPanel.classList.add('hidden');
+            exerciseView.classList.remove('hidden');
             if (currentFieldQuestions.length > 0) {
-                 // 分野別モードに戻る場合
-                 // 該当タブを選択状態にする必要はない (タブ自体は分野別のままのはず)
-                 currentFieldIndex = index; // インデックスを設定
-                 displayFieldQuestion(index); // 問題表示
+                currentFieldIndex = index;
+                displayFieldQuestion(index);
             } else {
-                 // 回数別モードに戻る場合
-                 // 該当タブを選択状態にする必要はない (タブ自体は回数別のままのはず)
-                 renderPage(questionInfo.pageNum); // 問題表示
+                renderPage(questionInfo.pageNum);
             }
         });
     });
@@ -439,19 +391,18 @@ tabByField.addEventListener('click', () => {
 });
 
 goBtnEdition.addEventListener('click', async () => {
-    console.log("🔘 回数別「表示」ボタンクリック");
     welcomeOverlay.style.display = 'none'; window.scrollTo(0, 0);
     correctCount = 0; updateScoreDisplay();
     answerHistory = {};
     currentFieldQuestions = [];
-    currentEdition = editionSelect.value;
-    currentSubject = subjectSelectEdition.value;
 
-    // 現在のセッションの問題リストを生成
+    currentEdition = editionSelect.value; // 変数をここで更新
+    currentSubject = subjectSelectEdition.value; // 変数をここで更新
+
     currentSessionQuestions = [];
     const url = `./pdf/${currentEdition}/${currentEdition}_${currentSubject}.pdf`;
+    showLoading(true);
     try {
-        // PDFを一時的に読み込んでページ数を取得
         const tempLoadingTask = pdfjsLib.getDocument(url);
         const tempPdfDoc = await tempLoadingTask.promise;
         const total = tempPdfDoc.numPages > 1 ? tempPdfDoc.numPages - 1 : 0;
@@ -459,17 +410,17 @@ goBtnEdition.addEventListener('click', async () => {
             currentSessionQuestions.push({ edition: currentEdition, subject: currentSubject, pageNum: i });
         }
     } catch (error) {
-         console.error("セッション問題リスト生成のためのPDF読み込み失敗", error);
+         console.error("セッションリスト生成PDF読込失敗", error);
          alert(`PDFファイルが見つかりません:\n${url}`);
-         return; // PDFがない場合は処理中断
+         showLoading(false);
+         return;
     }
 
     await loadAnswersForEdition(currentEdition);
-    await renderPdf(currentEdition, currentSubject);
+    await renderPdf(currentEdition, currentSubject); // ここでローディング解除
 });
 
 goBtnField.addEventListener('click', async () => {
-    console.log("🔘 分野別「表示」ボタンクリック");
     welcomeOverlay.style.display = 'none'; window.scrollTo(0, 0);
     correctCount = 0; updateScoreDisplay();
     answerHistory = {};
@@ -480,8 +431,6 @@ goBtnField.addEventListener('click', async () => {
     }
     currentFieldQuestions = fieldsData[subject][fieldIndex].questions;
     currentFieldIndex = 0;
-
-    // 現在のセッションの問題リストを生成
     currentSessionQuestions = currentFieldQuestions.map(q => ({...q, subject: subject}));
 
     if (currentFieldQuestions.length === 0) {
@@ -493,12 +442,13 @@ goBtnField.addEventListener('click', async () => {
         return;
     }
     pageCountSpan.textContent = currentFieldQuestions.length;
-    populateJumpSelector(0); // ジャンププルダウンは空にする
-    await displayFieldQuestion(currentFieldIndex);
+    populateJumpSelector(0);
+    showLoading(true);
+    await displayFieldQuestion(currentFieldIndex); // ここでローディング解除
 });
 
-subjectSelectEdition.addEventListener('change', (e) => { currentSubject = e.target.value; });
-editionSelect.addEventListener('change', (e) => { currentEdition = e.target.value; });
+subjectSelectEdition.addEventListener('change', (e) => { /* currentSubject は goBtnEdition で更新 */ });
+editionSelect.addEventListener('change', (e) => { /* currentEdition は goBtnEdition で更新 */ });
 subjectSelectField.addEventListener('change', populateFieldSelector);
 
 prevBtn.addEventListener('click', () => {
@@ -518,13 +468,9 @@ nextBtn.addEventListener('click', () => {
 });
 answerButtons.forEach(button => {
     button.addEventListener('click', (e) => {
-        // 既に解答済みなら何もしない（disabled属性で制御されるが念のため）
         if (e.currentTarget.disabled) return;
-
-        // 選択状態の更新
-        answerButtons.forEach(btn => btn.classList.remove('selected'));
-        e.currentTarget.classList.add('selected');
-        // 正誤判定
+        answerButtons.forEach(btn => btn.classList.remove('selected')); // 一旦クリアはしない方が良いかも？
+        e.currentTarget.classList.add('selected'); // クリックしたものを選択状態に
         checkAnswer(e.currentTarget.dataset.choice);
     });
 });
@@ -534,8 +480,6 @@ jumpToSelect.addEventListener('change', (e) => {
         if (target) { currentPageNum = target; renderPage(currentPageNum); }
     }
 });
-
-// 成績を見るボタン
 showResultsBtnEdition.addEventListener('click', showResults);
 showResultsBtnField.addEventListener('click', showResults);
 backToExerciseBtn.addEventListener('click', () => {
