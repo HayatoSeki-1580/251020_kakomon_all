@@ -9,11 +9,13 @@
 <body>
     <h1>過去問演習ブラウザ</h1>
 
+    <!-- モード選択タブ -->
     <div class="mode-tabs">
         <button id="tab-by-edition" class="tab-btn active">回数別演習</button>
         <button id="tab-by-field" class="tab-btn">分野別演習</button>
     </div>
 
+    <!-- 回数別パネル -->
     <div id="panel-by-edition" class="control-panel">
         <div class="top-row">
             <div class="select-group">
@@ -53,6 +55,7 @@
         </div>
     </div>
 
+    <!-- 分野別パネル -->
     <div id="panel-by-field" class="control-panel hidden">
         <div class="top-row">
             <div class="select-group">
@@ -92,6 +95,7 @@
         </div>
     </div>
 
+    <!-- 共通部分 -->
     <div class="navigation">
         <button id="prev-btn">◀ 前の問題</button>
         <span id="page-indicator">問 <span id="page-num">?</span> / <span id="page-count">?</span></span>
@@ -99,6 +103,8 @@
         <select id="jump-to-select" class="jump-select">
             <option value="">移動...</option>
         </select>
+        <!-- 出典情報を表示するエリア -->
+        <span id="question-source" class="source-info"></span>
     </div>
 
     <div class="viewer-container">
