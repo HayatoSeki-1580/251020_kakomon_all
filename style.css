@@ -77,6 +77,9 @@ select {
     align-items: center;
     gap: 1em;
     margin-bottom: 1em;
+    width: 100%;
+    max-width: 800px; /* パネルと幅を合わせる */
+    box-sizing: border-box;
 }
 .navigation button, #go-btn-edition, #go-btn-field {
     padding: 0.5em 1em;
@@ -196,12 +199,24 @@ select {
     color: #007bff;
 }
 
-/* ======== 汎用クラス ======== */
-.hidden {
-    display: none !important;
-}
-
 /* ======== 頻出度バーのスタイル ======== */
 #field-select {
     font-family: Consolas, "Courier New", monospace;
+}
+
+/* ======== 出典情報エリアのスタイル ======== */
+.source-info {
+    font-size: 0.9em;
+    color: #555;
+    font-weight: bold;
+    margin-left: auto; /* 右寄せにする */
+    padding: 0.5em;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    display: none; /* 初期状態では非表示 */
+}
+
+/* ======== 汎用クラス ======== */
+.hidden {
+    display: none !important;
 }
