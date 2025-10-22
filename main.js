@@ -8,7 +8,7 @@ let exerciseView, resultsPanel, welcomeOverlay, canvas, loadingSpinner,
     tabByEdition, tabByField, panelByEdition, panelByField,
     editionSelect, subjectSelectEdition, goBtnEdition, resultAreaEdition, scoreCorrectEdition, showResultsBtnEdition,
     subjectSelectField, fieldSelect, goBtnField, resultAreaField, scoreCorrectField, showResultsBtnField,
-    answerButtons, // これは NodeList なので initialize で取得
+    answerButtonsNodeList, // NodeList を保持する変数
     questionSource, resultsSummary, resultsList, backToExerciseBtn;
 
 let pdfDoc = null;
@@ -29,17 +29,20 @@ function showLoading(show) {
 
 /** 問題IDを生成するヘルパー関数 */
 function getQuestionId(edition, subject, pageNum) {
-    return `${edition}-${subject}-${pageNum}`;
+    // 念のため、null や undefined が入らないようにデフォルト値を設定
+    const e = edition || 'unknown';
+    const s = subject || 'unknown';
+    const p = pageNum || 'unknown';
+    return `${e}-${s}-${p}`;
 }
 
 /** 現在の問題情報から一意なIDを生成するヘルパー関数 */
 function getCurrentQuestionId() {
-    // 要素の存在を確認してから値を取得
     const currentSubjectVal = subjectSelectEdition ? subjectSelectEdition.value : '';
     const currentEditionVal = editionSelect ? editionSelect.value : '';
     const currentFieldSubjectVal = subjectSelectField ? subjectSelectField.value : '';
 
-    if (currentFieldQuestions.length > 0) {
+    if (currentFieldQuestions.length > 0 && currentFieldQuestions[currentFieldIndex]) {
         const question = currentFieldQuestions[currentFieldIndex];
         return getQuestionId(question.edition, currentFieldSubjectVal, question.pageNum);
     } else {
@@ -50,7 +53,7 @@ function getCurrentQuestionId() {
 
 /** 索引ファイル(editions.json)を読み込む */
 async function setupEditionSelector() {
-    if (!editionSelect) return; // 要素がなければ何もしない
+    if (!editionSelect) return;
     try {
         const url = './data/editions.json';
         const response = await fetch(url);
@@ -69,7 +72,7 @@ async function setupEditionSelector() {
 
 /** 分野別ファイル(fields.json)を読み込む */
 async function loadFieldsData() {
-    if (!fieldSelect) return; // 要素がなければ何もしない
+    if (!fieldSelect) return;
     try {
         const response = await fetch('./data/fields.json');
         if (!response.ok) throw new Error('HTTPエラー');
@@ -93,13 +96,11 @@ async function loadAnswersForEdition(edition) {
 
 /** PDFを読み込んで表示する */
 async function renderPdf(edition, subject, pageNum = 1) {
-    if (!canvas) return; // canvasがなければ処理中断
+    if (!canvas) return;
     currentPageNum = pageNum;
     const url = `./pdf/${edition}/${edition}_${subject}.pdf`;
     const loadingTaskOptions = { cMapUrl: './lib/pdfjs/web/cmaps/', cMapPacked: true, standardFontDataUrl: './lib/pdfjs/web/standard_fonts/' };
-
     showLoading(true);
-
     try {
         const loadingTask = pdfjsLib.getDocument(url, loadingTaskOptions);
         pdfDoc = await loadingTask.promise;
@@ -152,7 +153,7 @@ async function renderPageInternal(pdfPageNum) {
 
         let currentQuestionId;
         let questionEdition, questionSubject, questionPageNum;
-        if (currentFieldQuestions.length > 0) {
+        if (currentFieldQuestions.length > 0 && currentFieldQuestions[currentFieldIndex]) {
             const question = currentFieldQuestions[currentFieldIndex];
             questionEdition = question.edition;
             questionSubject = subjectSelectField ? subjectSelectField.value : '';
@@ -188,17 +189,19 @@ async function renderPageInternal(pdfPageNum) {
         const history = answerHistory[currentQuestionId];
         const resultArea = currentFieldQuestions.length > 0 ? resultAreaField : resultAreaEdition;
 
-        if (history && activePanel) {
+        if (history && activePanel && resultArea) { // resultAreaも確認
             const selectedButton = activePanel.querySelector(`.answer-btn[data-choice="${history.selected}"]`);
             const correctButton = activePanel.querySelector(`.answer-btn[data-choice="${history.correctAnswer}"]`);
 
             if (history.correct) {
                 if(selectedButton) selectedButton.classList.add('correct-selection');
-                if(resultArea) { resultArea.textContent = `正解！ 🎉`; resultArea.className = 'result-area correct'; }
+                resultArea.textContent = `正解！ 🎉`;
+                resultArea.className = 'result-area correct';
             } else {
                 if(selectedButton) selectedButton.classList.add('incorrect-selection');
                 if(correctButton) correctButton.classList.add('correct-answer');
-                if(resultArea) { resultArea.textContent = `不正解... (正解は ${history.correctAnswer}) ❌`; resultArea.className = 'result-area incorrect'; }
+                resultArea.textContent = `不正解... (正解は ${history.correctAnswer}) ❌`;
+                resultArea.className = 'result-area incorrect';
             }
             activeAnswerButtons.forEach(btn => { btn.disabled = true; btn.classList.add('disabled'); });
         } else if (resultArea) {
@@ -213,7 +216,6 @@ async function renderPageInternal(pdfPageNum) {
 /** 分野別プルダウンを生成する */
 function populateFieldSelector() {
     if (!fieldSelect || !subjectSelectField) return;
-
     const subject = subjectSelectField.value;
     const fields = fieldsData[subject] || [];
     fieldSelect.innerHTML = '';
@@ -259,7 +261,7 @@ function checkAnswer(selectedChoice) {
     let subjectKey;
     let questionPageNum;
 
-     if (currentFieldQuestions.length > 0) {
+     if (currentFieldQuestions.length > 0 && currentFieldQuestions[currentFieldIndex]) {
          const q = currentFieldQuestions[currentFieldIndex];
          subjectKey = subjectSelectField ? subjectSelectField.value : '';
          questionPageNum = q.pageNum;
@@ -314,7 +316,6 @@ function updateNavButtons() {
 /** 成績ページを生成して表示する */
 function showResults() {
     if(!exerciseView || !resultsPanel || !resultsList || !resultsSummary) return;
-
     exerciseView.classList.add('hidden'); resultsPanel.classList.remove('hidden');
     window.scrollTo(0, 0);
     const totalQuestions = currentSessionQuestions.length;
@@ -342,7 +343,6 @@ function showResults() {
     resultsList.appendChild(table);
     const accuracy = totalQuestions > 0 ? ((sessionCorrectCount / totalQuestions) * 100).toFixed(1) : 0;
     resultsSummary.innerHTML = `総問題数: ${totalQuestions}問 / 解答済み: ${answeredCount}問<br>正答数: ${sessionCorrectCount}問 / 正答率: ${accuracy}%`;
-
     document.querySelectorAll('.review-btn').forEach(button => {
         button.addEventListener('click', (e) => {
             const index = parseInt(e.target.dataset.index, 10);
@@ -368,8 +368,11 @@ function showResults() {
 }
 
 
-// --- イベントリスナーの設定 ---
+// --- イベントリスナー設定関数 ---
 function setupEventListeners() {
+    // answerButtonsNodeList をここで取得
+    answerButtonsNodeList = document.querySelectorAll('.answer-btn');
+
     if (tabByEdition) tabByEdition.addEventListener('click', () => {
         tabByEdition.classList.add('active'); if(tabByField) tabByField.classList.remove('active');
         if(panelByEdition) panelByEdition.classList.remove('hidden'); if(panelByField) panelByField.classList.add('hidden');
@@ -449,9 +452,7 @@ function setupEventListeners() {
         }
     });
 
-    // answerButtons は NodeList なので initialize で取得する必要あり
-    answerButtons = document.querySelectorAll('.answer-btn');
-    answerButtons.forEach(button => {
+    if (answerButtonsNodeList) answerButtonsNodeList.forEach(button => {
         button.addEventListener('click', (e) => {
             const parentPanel = e.currentTarget.closest('.control-panel');
             if (!parentPanel || parentPanel.classList.contains('hidden')) return;
@@ -505,180 +506,38 @@ async function initialize() {
     resultAreaField = document.getElementById('result-area-field');
     scoreCorrectField = panelByField ? panelByField.querySelector('.score-correct') : null;
     showResultsBtnField = document.getElementById('show-results-btn-field');
-    // answerButtons は setupEventListeners で取得・設定
+    // answerButtonsNodeList は setupEventListeners で取得
     questionSource = document.getElementById('question-source');
     resultsSummary = document.getElementById('results-summary');
     resultsList = document.getElementById('results-list');
     backToExerciseBtn = document.getElementById('back-to-exercise-btn');
 
-    // --- 必須要素の存在チェック (より詳細に) ---
+    // 必須要素の存在チェック
     const requiredElements = {
-        editionSelect,
-        fieldSelect,
-        subjectSelectField,
-        canvas,
-        subjectSelectEdition,
-        goBtnEdition, // イベントリスナー設定に必要
-        goBtnField,   // イベントリスナー設定に必要
-        // 他にも動作に必須な要素があれば追加
+        editionSelect, fieldSelect, subjectSelectField, canvas, subjectSelectEdition,
+        goBtnEdition, goBtnField, prevBtn, nextBtn, jumpToSelect, tabByEdition, tabByField,
+        panelByEdition, panelByField, showResultsBtnEdition, showResultsBtnField, backToExerciseBtn
     };
-
     let missingElementId = null;
     for (const id in requiredElements) {
-        if (!requiredElements[id]) {
-            missingElementId = id; // 見つからなかった要素の変数名を記録
-            break;
-        }
+        if (!requiredElements[id]) { missingElementId = id; break; }
     }
-
     if (missingElementId) {
-        console.error(`❌ 初期化失敗: HTML要素 '${missingElementId}' が見つかりません。index.htmlのIDを確認してください。`);
-        alert(`ページの読み込みに失敗しました。HTML構造を確認してください。(要素: ${missingElementId})`);
-        return; // 処理を中断
+        console.error(`❌ 初期化失敗: HTML要素 '${missingElementId}' が見つかりません。`);
+        alert(`ページの読み込みに失敗しました。(要素: ${missingElementId})`);
+        return;
     }
-    // --- チェックここまで ---
-
-    // 初期値設定 (要素が存在することが保証された後)
-    currentSubject = subjectSelectEdition.value;
-
-    // 非同期処理の実行
-    await setupEditionSelector(); // editions.json を読み込んでから currentEdition を設定
-    if (editionSelect && editionSelect.options.length > 0) {
-        currentEdition = editionSelect.value; // 初期値を設定
-    }
-    await loadFieldsData(); // fields.json を読み込み、分野プルダウンを生成
 
     // イベントリスナーの設定
-    setupEventListeners();
+    setupEventListeners(); // 要素取得後に実行
 
-    console.log("✅ 初期化完了。ユーザーの操作を待っています。");
+    // 非同期処理の実行
+    await setupEditionSelector();
+    await loadFieldsData();
+
+    console.log("✅ 初期化完了。");
 }
 
 // --- アプリケーションの実行 ---
-// DOMが完全に読み込まれてから初期化処理を実行
-document.addEventListener('DOMContentLoaded', initialize);
-
-// setupEventListeners 関数も initialize 内で要素を取得した後に呼び出す必要があるので、
-// initialize の最後ではなく、 setupEventListeners 関数自体を initialize の最後に呼び出すか、
-// setupEventListeners の中でも要素取得を行う必要があります。
-// 今回は initialize の最後で setupEventListeners を呼び出す形にします。
-
-// --- イベントリスナー設定関数 ---
-function setupEventListeners() {
-    // answerButtons は NodeList なのでここで取得・設定
-    answerButtonsNodeList = document.querySelectorAll('.answer-btn');
-
-    // 各要素の存在を確認してからリスナーを設定
-    if (tabByEdition) tabByEdition.addEventListener('click', () => { /* ... */ });
-    if (tabByField) tabByField.addEventListener('click', () => { /* ... */ });
-    if (goBtnEdition) goBtnEdition.addEventListener('click', async () => { /* ... */ });
-    if (goBtnField) goBtnField.addEventListener('click', async () => { /* ... */ });
-    if (subjectSelectEdition) subjectSelectEdition.addEventListener('change', (e) => { /* 表示ボタンで更新 */ });
-    if (editionSelect) editionSelect.addEventListener('change', (e) => { /* 表示ボタンで更新 */ });
-    if (subjectSelectField) subjectSelectField.addEventListener('change', populateFieldSelector);
-    if (prevBtn) prevBtn.addEventListener('click', () => { /* ... */ });
-    if (nextBtn) nextBtn.addEventListener('click', () => { /* ... */ });
-    if (answerButtonsNodeList) answerButtonsNodeList.forEach(button => { /* ... */ });
-    if (jumpToSelect) jumpToSelect.addEventListener('change', (e) => { /* ... */ });
-    if (showResultsBtnEdition) showResultsBtnEdition.addEventListener('click', showResults);
-    if (showResultsBtnField) showResultsBtnField.addEventListener('click', showResults);
-    if (backToExerciseBtn) backToExerciseBtn.addEventListener('click', () => { /* ... */ });
-
-    // --- イベントリスナー内のコード (変更なし部分) ---
-     if (tabByEdition) tabByEdition.addEventListener('click', () => {
-         tabByEdition.classList.add('active'); if(tabByField) tabByField.classList.remove('active');
-         if(panelByEdition) panelByEdition.classList.remove('hidden'); if(panelByField) panelByField.classList.add('hidden');
-         if(questionSource) questionSource.style.display = 'none';
-     });
-     if (tabByField) tabByField.addEventListener('click', () => {
-         tabByField.classList.add('active'); if(tabByEdition) tabByEdition.classList.remove('active');
-         if(panelByField) panelByField.classList.remove('hidden'); if(panelByEdition) panelByEdition.classList.add('hidden');
-     });
-     if (goBtnEdition) goBtnEdition.addEventListener('click', async () => {
-         if(welcomeOverlay) welcomeOverlay.style.display = 'none'; window.scrollTo(0, 0);
-         correctCount = 0; updateScoreDisplay(); answerHistory = {};
-         currentFieldQuestions = [];
-         const selectedEdition = editionSelect.value;
-         const selectedSubject = subjectSelectEdition.value;
-         currentSessionQuestions = [];
-         const url = `./pdf/${selectedEdition}/${selectedEdition}_${selectedSubject}.pdf`;
-         showLoading(true);
-         try {
-             const tempLoadingTask = pdfjsLib.getDocument(url);
-             const tempPdfDoc = await tempLoadingTask.promise;
-             const total = tempPdfDoc.numPages > 1 ? tempPdfDoc.numPages - 1 : 0;
-             for (let i = 1; i <= total; i++) {
-                 currentSessionQuestions.push({ edition: selectedEdition, subject: selectedSubject, pageNum: i });
-             }
-         } catch (error) {
-              console.error("セッションリスト生成PDF読込失敗", error); alert(`PDFファイルが見つかりません:\n${url}`);
-              showLoading(false); return;
-         }
-         await loadAnswersForEdition(selectedEdition);
-         await renderPdf(selectedEdition, selectedSubject);
-     });
-     if (goBtnField) goBtnField.addEventListener('click', async () => {
-         if(welcomeOverlay) welcomeOverlay.style.display = 'none'; window.scrollTo(0, 0);
-         correctCount = 0; updateScoreDisplay(); answerHistory = {};
-         const subject = subjectSelectField.value;
-         const fieldIndex = fieldSelect.value;
-         if (fieldIndex === "" || !fieldsData[subject] || !fieldsData[subject][fieldIndex]) {
-              alert("分野を選択してください。"); return;
-         }
-         currentFieldQuestions = fieldsData[subject][fieldIndex].questions;
-         currentFieldIndex = 0;
-         currentSessionQuestions = currentFieldQuestions.map(q => ({...q, subject: subject}));
-         if (currentFieldQuestions.length === 0) {
-             alert("この分野には問題が登録されていません。");
-             if(pageCountSpan) pageCountSpan.textContent = '0'; if(pageNumSpan) pageNumSpan.textContent = '0';
-             populateJumpSelector(0);
-             const context = canvas ? canvas.getContext('2d') : null; if(context) context.clearRect(0, 0, canvas.width, canvas.height);
-             if(questionSource) questionSource.style.display = 'none';
-             return;
-         }
-         if(pageCountSpan) pageCountSpan.textContent = currentFieldQuestions.length;
-         populateJumpSelector(0);
-         showLoading(true);
-         await displayFieldQuestion(currentFieldIndex);
-     });
-     if (prevBtn) prevBtn.addEventListener('click', () => {
-         if (currentFieldQuestions.length > 0) {
-             if (currentFieldIndex > 0) { currentFieldIndex--; displayFieldQuestion(currentFieldIndex); }
-         } else {
-             if (currentPageNum > 1) { currentPageNum--; renderPageInternal(currentPageNum); }
-         }
-     });
-     if (nextBtn) nextBtn.addEventListener('click', () => {
-         if (currentFieldQuestions.length > 0) {
-             if (currentFieldIndex < currentFieldQuestions.length - 1) { currentFieldIndex++; displayFieldQuestion(currentFieldIndex); }
-         } else {
-             const total = pdfDoc ? pdfDoc.numPages - 1 : 0;
-             if (currentPageNum < total) { currentPageNum++; renderPageInternal(currentPageNum); }
-         }
-     });
-     if (answerButtonsNodeList) answerButtonsNodeList.forEach(button => {
-         button.addEventListener('click', (e) => {
-             const parentPanel = e.currentTarget.closest('.control-panel');
-             if (!parentPanel || parentPanel.classList.contains('hidden')) return;
-             if (e.currentTarget.disabled) return;
-             checkAnswer(e.currentTarget.dataset.choice);
-         });
-     });
-     if (jumpToSelect) jumpToSelect.addEventListener('change', (e) => {
-         if (currentFieldQuestions.length === 0) {
-             const target = parseInt(e.target.value, 10);
-             if (target) { currentPageNum = target; renderPageInternal(currentPageNum); }
-         }
-     });
-     if (showResultsBtnEdition) showResultsBtnEdition.addEventListener('click', showResults);
-     if (showResultsBtnField) showResultsBtnField.addEventListener('click', showResults);
-     if (backToExerciseBtn) backToExerciseBtn.addEventListener('click', () => {
-         if(resultsPanel) resultsPanel.classList.add('hidden');
-         if(exerciseView) exerciseView.classList.remove('hidden');
-     });
-}
-
-// --- アプリケーションの実行 ---
-// DOMが完全に読み込まれてから初期化処理を実行
 document.addEventListener('DOMContentLoaded', initialize);
 
