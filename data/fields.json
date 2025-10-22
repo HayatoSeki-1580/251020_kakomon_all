@@ -265,6 +265,55 @@
   ],
   "kanon": [
     {
+      "fieldName": "JIS Z 8731 環境騒音の表示・測定方法",
+      "questions": [
+        { "edition": "75", "pageNum": "14" },
+        { "edition": "74", "pageNum": "13" },
+        { "edition": "74", "pageNum": "14" },
+        { "edition": "73", "pageNum": "13" },
+        { "edition": "73", "pageNum": "14" },
+        { "edition": "72", "pageNum": "13" },
+        { "edition": "72", "pageNum": "14" },
+        { "edition": "71", "pageNum": "14" }
+      ]
+    },
+    {
+      "fieldName": "JIS C 1509-1 電気音響-サウンドレベルメータ(騒音計)-第１部：仕様",
+      "questions": [
+        { "edition": "75", "pageNum": "11" },
+        { "edition": "74", "pageNum": "11" },
+        { "edition": "73", "pageNum": "11" },
+        { "edition": "72", "pageNum": "11" },
+        { "edition": "71", "pageNum": "11" }
+      ]
+    },
+    {
+      "fieldName": "JIS C 1517, 1516 振動レベル計, 騒音計 -取引又は証明用",
+      "questions": [
+        { "edition": "74", "pageNum": "21" },
+        { "edition": "73", "pageNum": "22" },
+        { "edition": "72", "pageNum": "12" },
+        { "edition": "72", "pageNum": "23" },
+        { "edition": "71", "pageNum": "23" }
+      ]
+    },
+    {
+      "fieldName": "JIS C 1513-1 電気音響 - オクターブバンド及び1/Nオクターブバンドフィルタ(分析器) -第１部：仕様",
+      "questions": [
+        { "edition": "75", "pageNum": "7" },
+        { "edition": "74", "pageNum": "7" },
+        { "edition": "73", "pageNum": "7" }
+      ]
+    },
+    {
+      "fieldName": "JIS C 1510 振動レベル計",
+      "questions": [
+        { "edition": "75", "pageNum": "24" },
+        { "edition": "74", "pageNum": "24" },
+        { "edition": "73", "pageNum": "24" }
+      ]
+    },
+    {
       "fieldName": "JIS",
       "questions": [
         { "edition": "75", "pageNum": "7" },
