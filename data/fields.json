@@ -594,7 +594,37 @@
   ],
   "keishitsu": [
   {
-      "fieldName": "test1,
+      "fieldName": "計量器概論：用語",
+      "questions": [
+        { "edition": "75", "pageNum": "1" },
+        { "edition": "74", "pageNum": "1" },
+        { "edition": "73", "pageNum": "1" },
+        { "edition": "72", "pageNum": "1" },
+        { "edition": "71", "pageNum": "1" }
+      ]
+    },
+    {
+      "fieldName": "計量器概論：単位",
+      "questions": [
+        { "edition": "75", "pageNum": "1" },
+        { "edition": "74", "pageNum": "1" },
+        { "edition": "73", "pageNum": "1" },
+        { "edition": "72", "pageNum": "1" },
+        { "edition": "71", "pageNum": "1" }
+      ]
+    },
+    {
+      "fieldName": "計量器概論：不確かさ・バラつき・信頼性",
+      "questions": [
+        { "edition": "75", "pageNum": "1" },
+        { "edition": "74", "pageNum": "1" },
+        { "edition": "73", "pageNum": "1" },
+        { "edition": "72", "pageNum": "1" },
+        { "edition": "71", "pageNum": "1" }
+      ]
+    },
+    {
+      "fieldName": "test1",
       "questions": [
         { "edition": "75", "pageNum": "1" },
         { "edition": "74", "pageNum": "1" },
