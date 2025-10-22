@@ -253,6 +253,46 @@
       ]
     }
   ],
+  "kanon": [
+    {
+      "fieldName": "JIS",
+      "questions": [
+        { "edition": "75", "pageNum": "1" },
+        { "edition": "75", "pageNum": "2" },
+        { "edition": "75", "pageNum": "3" },
+        { "edition": "75", "pageNum": "4" },
+        { "edition": "75", "pageNum": "5" },
+        
+        { "edition": "74", "pageNum": "7" },
+        { "edition": "74", "pageNum": "8" },
+        { "edition": "74", "pageNum": "9" },
+        { "edition": "74", "pageNum": "11" },
+        { "edition": "74", "pageNum": "13" },
+        { "edition": "74", "pageNum": "14" },
+        { "edition": "74", "pageNum": "21" },
+        { "edition": "74", "pageNum": "22" },
+        { "edition": "74", "pageNum": "24" },
+        
+        { "edition": "73", "pageNum": "7" },
+        { "edition": "73", "pageNum": "9" },
+        { "edition": "73", "pageNum": "11" },
+        { "edition": "73", "pageNum": "13" },
+        { "edition": "73", "pageNum": "14" },
+        { "edition": "73", "pageNum": "22" },
+        { "edition": "73", "pageNum": "24" },
+        { "edition": "72", "pageNum": "8" },
+        { "edition": "72", "pageNum": "9" },
+        { "edition": "72", "pageNum": "11" },
+        { "edition": "72", "pageNum": "12" },
+        { "edition": "72", "pageNum": "13" },
+        { "edition": "72", "pageNum": "14" },
+        { "edition": "72", "pageNum": "23" },
+        { "edition": "71", "pageNum": "11" },
+        { "edition": "71", "pageNum": "14" },
+        { "edition": "71", "pageNum": "23" }
+      ]
+    }
+  ],
   
   "kanri": [
     {
