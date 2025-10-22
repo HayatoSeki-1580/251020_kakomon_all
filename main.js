@@ -490,5 +490,6 @@ async function initialize() {
 }
 
 // --- アプリケーションの実行 ---
-initialize();
+// DOMが完全に読み込まれてから初期化処理を実行するように変更
+document.addEventListener('DOMContentLoaded', initialize);
 
