@@ -38,25 +38,37 @@ let correctCount = 0;
 let currentSubject = subjectSelectEdition.value; // 初期値
 let currentEdition = ''; // 初期値は initialize で設定
 
-/** 索引ファイル(editions.json)を読み込む */
+/** 索引ファイル(editions.json)を読み込み、実施回のセレクトボックスを初期化する */
 async function setupEditionSelector() {
+    console.log("🔄 setupEditionSelector 関数を開始");
     try {
         const url = './data/editions.json';
         const response = await fetch(url);
-        if (!response.ok) throw new Error(`HTTPエラー`);
+        if (!response.ok) throw new Error(`HTTPエラー！ ステータス: ${response.status}`);
         const data = await response.json();
+        console.log("📄 editions.json のデータ:", data);
+
+        // 【修正】オブジェクトのvalueを基準に新しい順で並べ替え
         const editions = data.available.sort((a, b) => b.value - a.value);
+
         editionSelect.innerHTML = '';
-        editions.forEach(info => {
+        // 【修正】オブジェクト(editionInfo)から値を取り出すように修正
+        editions.forEach(editionInfo => {
             const option = document.createElement('option');
-            option.value = info.value;
-            option.textContent = info.displayText;
+            option.value = editionInfo.value;         // 値を設定
+            option.textContent = editionInfo.displayText; // 表示テキストを設定
             editionSelect.appendChild(option);
         });
+
+        // 初期値を設定 (存在すれば)
         if (editionSelect.options.length > 0) {
             currentEdition = editionSelect.value;
         }
-    } catch (error) { console.error("❌ editions.json読込エラー:", error); }
+        console.log(`✅ プルダウンを生成完了。現在の選択: ${currentEdition}`);
+    } catch (error) {
+        console.error("❌ setupEditionSelector 関数で致命的なエラー:", error);
+        alert('editions.jsonの読み込みに失敗しました。コンソールを確認してください。');
+    }
 }
 
 /** 分野別ファイル(fields.json)を読み込む */
