@@ -511,14 +511,34 @@ async function initialize() {
     resultsList = document.getElementById('results-list');
     backToExerciseBtn = document.getElementById('back-to-exercise-btn');
 
-    // 必須要素の存在チェック
-    if (!editionSelect || !fieldSelect || !subjectSelectField || !canvas || !subjectSelectEdition) {
-        console.error("❌ 初期化に必要なHTML要素が見つかりません。");
-        alert("ページの読み込みに失敗しました。HTML構造を確認してください。");
-        return;
+    // --- 必須要素の存在チェック (より詳細に) ---
+    const requiredElements = {
+        editionSelect,
+        fieldSelect,
+        subjectSelectField,
+        canvas,
+        subjectSelectEdition,
+        goBtnEdition, // イベントリスナー設定に必要
+        goBtnField,   // イベントリスナー設定に必要
+        // 他にも動作に必須な要素があれば追加
+    };
+
+    let missingElementId = null;
+    for (const id in requiredElements) {
+        if (!requiredElements[id]) {
+            missingElementId = id; // 見つからなかった要素の変数名を記録
+            break;
+        }
     }
 
-    // 初期値設定
+    if (missingElementId) {
+        console.error(`❌ 初期化失敗: HTML要素 '${missingElementId}' が見つかりません。index.htmlのIDを確認してください。`);
+        alert(`ページの読み込みに失敗しました。HTML構造を確認してください。(要素: ${missingElementId})`);
+        return; // 処理を中断
+    }
+    // --- チェックここまで ---
+
+    // 初期値設定 (要素が存在することが保証された後)
     currentSubject = subjectSelectEdition.value;
 
     // 非同期処理の実行
@@ -532,6 +552,130 @@ async function initialize() {
     setupEventListeners();
 
     console.log("✅ 初期化完了。ユーザーの操作を待っています。");
+}
+
+// --- アプリケーションの実行 ---
+// DOMが完全に読み込まれてから初期化処理を実行
+document.addEventListener('DOMContentLoaded', initialize);
+
+// setupEventListeners 関数も initialize 内で要素を取得した後に呼び出す必要があるので、
+// initialize の最後ではなく、 setupEventListeners 関数自体を initialize の最後に呼び出すか、
+// setupEventListeners の中でも要素取得を行う必要があります。
+// 今回は initialize の最後で setupEventListeners を呼び出す形にします。
+
+// --- イベントリスナー設定関数 ---
+function setupEventListeners() {
+    // answerButtons は NodeList なのでここで取得・設定
+    answerButtonsNodeList = document.querySelectorAll('.answer-btn');
+
+    // 各要素の存在を確認してからリスナーを設定
+    if (tabByEdition) tabByEdition.addEventListener('click', () => { /* ... */ });
+    if (tabByField) tabByField.addEventListener('click', () => { /* ... */ });
+    if (goBtnEdition) goBtnEdition.addEventListener('click', async () => { /* ... */ });
+    if (goBtnField) goBtnField.addEventListener('click', async () => { /* ... */ });
+    if (subjectSelectEdition) subjectSelectEdition.addEventListener('change', (e) => { /* 表示ボタンで更新 */ });
+    if (editionSelect) editionSelect.addEventListener('change', (e) => { /* 表示ボタンで更新 */ });
+    if (subjectSelectField) subjectSelectField.addEventListener('change', populateFieldSelector);
+    if (prevBtn) prevBtn.addEventListener('click', () => { /* ... */ });
+    if (nextBtn) nextBtn.addEventListener('click', () => { /* ... */ });
+    if (answerButtonsNodeList) answerButtonsNodeList.forEach(button => { /* ... */ });
+    if (jumpToSelect) jumpToSelect.addEventListener('change', (e) => { /* ... */ });
+    if (showResultsBtnEdition) showResultsBtnEdition.addEventListener('click', showResults);
+    if (showResultsBtnField) showResultsBtnField.addEventListener('click', showResults);
+    if (backToExerciseBtn) backToExerciseBtn.addEventListener('click', () => { /* ... */ });
+
+    // --- イベントリスナー内のコード (変更なし部分) ---
+     if (tabByEdition) tabByEdition.addEventListener('click', () => {
+         tabByEdition.classList.add('active'); if(tabByField) tabByField.classList.remove('active');
+         if(panelByEdition) panelByEdition.classList.remove('hidden'); if(panelByField) panelByField.classList.add('hidden');
+         if(questionSource) questionSource.style.display = 'none';
+     });
+     if (tabByField) tabByField.addEventListener('click', () => {
+         tabByField.classList.add('active'); if(tabByEdition) tabByEdition.classList.remove('active');
+         if(panelByField) panelByField.classList.remove('hidden'); if(panelByEdition) panelByEdition.classList.add('hidden');
+     });
+     if (goBtnEdition) goBtnEdition.addEventListener('click', async () => {
+         if(welcomeOverlay) welcomeOverlay.style.display = 'none'; window.scrollTo(0, 0);
+         correctCount = 0; updateScoreDisplay(); answerHistory = {};
+         currentFieldQuestions = [];
+         const selectedEdition = editionSelect.value;
+         const selectedSubject = subjectSelectEdition.value;
+         currentSessionQuestions = [];
+         const url = `./pdf/${selectedEdition}/${selectedEdition}_${selectedSubject}.pdf`;
+         showLoading(true);
+         try {
+             const tempLoadingTask = pdfjsLib.getDocument(url);
+             const tempPdfDoc = await tempLoadingTask.promise;
+             const total = tempPdfDoc.numPages > 1 ? tempPdfDoc.numPages - 1 : 0;
+             for (let i = 1; i <= total; i++) {
+                 currentSessionQuestions.push({ edition: selectedEdition, subject: selectedSubject, pageNum: i });
+             }
+         } catch (error) {
+              console.error("セッションリスト生成PDF読込失敗", error); alert(`PDFファイルが見つかりません:\n${url}`);
+              showLoading(false); return;
+         }
+         await loadAnswersForEdition(selectedEdition);
+         await renderPdf(selectedEdition, selectedSubject);
+     });
+     if (goBtnField) goBtnField.addEventListener('click', async () => {
+         if(welcomeOverlay) welcomeOverlay.style.display = 'none'; window.scrollTo(0, 0);
+         correctCount = 0; updateScoreDisplay(); answerHistory = {};
+         const subject = subjectSelectField.value;
+         const fieldIndex = fieldSelect.value;
+         if (fieldIndex === "" || !fieldsData[subject] || !fieldsData[subject][fieldIndex]) {
+              alert("分野を選択してください。"); return;
+         }
+         currentFieldQuestions = fieldsData[subject][fieldIndex].questions;
+         currentFieldIndex = 0;
+         currentSessionQuestions = currentFieldQuestions.map(q => ({...q, subject: subject}));
+         if (currentFieldQuestions.length === 0) {
+             alert("この分野には問題が登録されていません。");
+             if(pageCountSpan) pageCountSpan.textContent = '0'; if(pageNumSpan) pageNumSpan.textContent = '0';
+             populateJumpSelector(0);
+             const context = canvas ? canvas.getContext('2d') : null; if(context) context.clearRect(0, 0, canvas.width, canvas.height);
+             if(questionSource) questionSource.style.display = 'none';
+             return;
+         }
+         if(pageCountSpan) pageCountSpan.textContent = currentFieldQuestions.length;
+         populateJumpSelector(0);
+         showLoading(true);
+         await displayFieldQuestion(currentFieldIndex);
+     });
+     if (prevBtn) prevBtn.addEventListener('click', () => {
+         if (currentFieldQuestions.length > 0) {
+             if (currentFieldIndex > 0) { currentFieldIndex--; displayFieldQuestion(currentFieldIndex); }
+         } else {
+             if (currentPageNum > 1) { currentPageNum--; renderPageInternal(currentPageNum); }
+         }
+     });
+     if (nextBtn) nextBtn.addEventListener('click', () => {
+         if (currentFieldQuestions.length > 0) {
+             if (currentFieldIndex < currentFieldQuestions.length - 1) { currentFieldIndex++; displayFieldQuestion(currentFieldIndex); }
+         } else {
+             const total = pdfDoc ? pdfDoc.numPages - 1 : 0;
+             if (currentPageNum < total) { currentPageNum++; renderPageInternal(currentPageNum); }
+         }
+     });
+     if (answerButtonsNodeList) answerButtonsNodeList.forEach(button => {
+         button.addEventListener('click', (e) => {
+             const parentPanel = e.currentTarget.closest('.control-panel');
+             if (!parentPanel || parentPanel.classList.contains('hidden')) return;
+             if (e.currentTarget.disabled) return;
+             checkAnswer(e.currentTarget.dataset.choice);
+         });
+     });
+     if (jumpToSelect) jumpToSelect.addEventListener('change', (e) => {
+         if (currentFieldQuestions.length === 0) {
+             const target = parseInt(e.target.value, 10);
+             if (target) { currentPageNum = target; renderPageInternal(currentPageNum); }
+         }
+     });
+     if (showResultsBtnEdition) showResultsBtnEdition.addEventListener('click', showResults);
+     if (showResultsBtnField) showResultsBtnField.addEventListener('click', showResults);
+     if (backToExerciseBtn) backToExerciseBtn.addEventListener('click', () => {
+         if(resultsPanel) resultsPanel.classList.add('hidden');
+         if(exerciseView) exerciseView.classList.remove('hidden');
+     });
 }
 
 // --- アプリケーションの実行 ---
