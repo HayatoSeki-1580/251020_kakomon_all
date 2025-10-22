@@ -20,11 +20,12 @@ const goBtnEdition = document.getElementById('go-btn-edition');
 const resultAreaEdition = document.getElementById('result-area-edition');
 const scoreCorrectEdition = panelByEdition.querySelector('.score-correct');
 const subjectSelectField = document.getElementById('subject-select-field');
-const fieldSelect = document.getElementById('field-select'); // 【変更】標準のselectに戻す
+const fieldSelect = document.getElementById('field-select');
 const goBtnField = document.getElementById('go-btn-field');
 const resultAreaField = document.getElementById('result-area-field');
 const scoreCorrectField = panelByField.querySelector('.score-correct');
 const answerButtons = document.querySelectorAll('.answer-btn');
+const questionSource = document.getElementById('question-source'); // 出典表示要素
 
 // --- グローバル変数 ---
 let pdfDoc = null;
@@ -34,6 +35,8 @@ let fieldsData = {};
 let currentFieldQuestions = [];
 let currentFieldIndex = 0;
 let correctCount = 0;
+let currentSubject = subjectSelectEdition.value; // 初期値
+let currentEdition = ''; // 初期値は initialize で設定
 
 /** 索引ファイル(editions.json)を読み込む */
 async function setupEditionSelector() {
@@ -50,6 +53,9 @@ async function setupEditionSelector() {
             option.textContent = info.displayText;
             editionSelect.appendChild(option);
         });
+        if (editionSelect.options.length > 0) {
+            currentEdition = editionSelect.value;
+        }
     } catch (error) { console.error("❌ editions.json読込エラー:", error); }
 }
 
@@ -93,6 +99,13 @@ async function renderPdf(edition, subject, pageNum = 1) {
     } catch (error) {
         console.error("❌ PDF読込エラー:", error);
         alert(`PDFファイルが見つかりません:\n${url}`);
+        // エラー時も表示をリセット
+        const context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        pageCountSpan.textContent = '0';
+        pageNumSpan.textContent = '0';
+        populateJumpSelector(0);
+        questionSource.style.display = 'none'; // エラー時は出典も隠す
     }
 }
 
@@ -119,7 +132,20 @@ async function renderPage(num) {
         canvas.width = viewport.width;
         context.clearRect(0, 0, canvas.width, canvas.height);
         await page.render({ canvasContext: context, viewport }).promise;
-        pageNumSpan.textContent = (currentFieldQuestions.length > 0) ? (currentFieldIndex + 1) : num;
+
+        if (currentFieldQuestions.length > 0) {
+            // 分野別モード
+            const question = currentFieldQuestions[currentFieldIndex];
+            pageNumSpan.textContent = currentFieldIndex + 1;
+            // 出典情報を表示
+            questionSource.textContent = `出典: 第${question.edition}回 問${question.pageNum}`;
+            questionSource.style.display = 'inline'; // 表示
+        } else {
+            // 回数別モード
+            pageNumSpan.textContent = num;
+            questionSource.style.display = 'none'; // 非表示
+        }
+
         resultAreaEdition.textContent = '';
         resultAreaField.textContent = '';
         updateNavButtons();
@@ -149,8 +175,10 @@ function populateFieldSelector() {
 
 /** 分野別の問題を表示する */
 async function displayFieldQuestion(index) {
+    if (!currentFieldQuestions[index]) return;
     const question = currentFieldQuestions[index];
     await loadAnswersForEdition(question.edition);
+    // PDF全体を読み込み直し、指定ページを表示
     await renderPdf(question.edition, subjectSelectField.value, parseInt(question.pageNum, 10));
 }
 
@@ -192,12 +220,12 @@ function updateNavButtons() {
     if (currentFieldQuestions.length > 0) {
         prevBtn.disabled = (currentFieldIndex <= 0);
         nextBtn.disabled = (currentFieldIndex >= currentFieldQuestions.length - 1);
-        jumpToSelect.disabled = true;
+        jumpToSelect.disabled = true; // 分野別モードではジャンプ無効
     } else {
         const total = pdfDoc ? pdfDoc.numPages - 1 : 0;
         prevBtn.disabled = (currentPageNum <= 1);
         nextBtn.disabled = (currentPageNum >= total);
-        jumpToSelect.disabled = false;
+        jumpToSelect.disabled = false; // 回数別モードではジャンプ有効
     }
 }
 
@@ -205,16 +233,18 @@ function updateNavButtons() {
 tabByEdition.addEventListener('click', () => {
     tabByEdition.classList.add('active'); tabByField.classList.remove('active');
     panelByEdition.classList.remove('hidden'); panelByField.classList.add('hidden');
+    questionSource.style.display = 'none'; // タブ切替時も出典を隠す
 });
 tabByField.addEventListener('click', () => {
     tabByField.classList.add('active'); tabByEdition.classList.remove('active');
     panelByField.classList.remove('hidden'); panelByEdition.classList.add('hidden');
+    // 分野別タブを開いた時点では出典は表示しない (表示ボタン押下後)
 });
 
 goBtnEdition.addEventListener('click', async () => {
     welcomeOverlay.style.display = 'none'; window.scrollTo(0, 0);
     correctCount = 0; updateScoreDisplay();
-    currentFieldQuestions = [];
+    currentFieldQuestions = []; // 分野別モード状態をリセット
     await loadAnswersForEdition(editionSelect.value);
     await renderPdf(editionSelect.value, subjectSelectEdition.value);
 });
@@ -223,21 +253,31 @@ goBtnField.addEventListener('click', async () => {
     welcomeOverlay.style.display = 'none'; window.scrollTo(0, 0);
     correctCount = 0; updateScoreDisplay();
     const subject = subjectSelectField.value;
-    const fieldIndex = fieldSelect.value;
+    const fieldIndex = fieldSelect.value; // 標準selectの値を取得
     if (!fieldsData[subject] || !fieldsData[subject][fieldIndex]) {
         alert("分野を選択してください。"); return;
     }
     currentFieldQuestions = fieldsData[subject][fieldIndex].questions;
     currentFieldIndex = 0;
     if (currentFieldQuestions.length === 0) {
-        alert("この分野には問題がありません。"); return;
+        alert("この分野には問題がありません。");
+        pageCountSpan.textContent = '0';
+        pageNumSpan.textContent = '0';
+        populateJumpSelector(0);
+        const context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        questionSource.style.display = 'none';
+        return;
     }
-    pageCountSpan.textContent = currentFieldQuestions.length;
-    populateJumpSelector(0);
+    pageCountSpan.textContent = currentFieldQuestions.length; // 総問題数を更新
+    populateJumpSelector(0); // ジャンププルダウンは空にする
     await displayFieldQuestion(currentFieldIndex);
 });
 
-subjectSelectField.addEventListener('change', populateFieldSelector);
+subjectSelectEdition.addEventListener('change', (e) => { currentSubject = e.target.value; });
+editionSelect.addEventListener('change', (e) => { currentEdition = e.target.value; });
+subjectSelectField.addEventListener('change', populateFieldSelector); // 科目が変わったら分野プルダウンを更新
+
 prevBtn.addEventListener('click', () => {
     if (currentFieldQuestions.length > 0) {
         if (currentFieldIndex > 0) { currentFieldIndex--; displayFieldQuestion(currentFieldIndex); }
@@ -261,6 +301,7 @@ answerButtons.forEach(button => {
     });
 });
 jumpToSelect.addEventListener('change', (e) => {
+    // 回数別モードでのみ動作
     if (currentFieldQuestions.length === 0) {
         const target = parseInt(e.target.value, 10);
         if (target) { currentPageNum = target; renderPage(currentPageNum); }
