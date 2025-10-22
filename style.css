@@ -135,6 +135,7 @@ select {
     padding: 2em;
     box-sizing: border-box;
     border-radius: 8px;
+    z-index: 10; /* スピナーよりは下 */
 }
 #welcome-overlay h2 {
     margin-top: 0;
@@ -316,6 +317,38 @@ select {
 }
 #back-to-exercise-btn:hover {
     background-color: #0056b3;
+}
+
+/* ======== ロード中スピナーのスタイル ======== */
+.spinner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8); /* 半透明の白背景 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 100; /* 最前面に表示 */
+}
+.spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border-left-color: #007bff; /* スピナーの色 */
+    animation: spin 1s ease infinite;
+    margin-bottom: 10px;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.spinner-overlay p {
+    font-weight: bold;
+    color: #333;
 }
 
 /* ======== 汎用クラス ======== */
