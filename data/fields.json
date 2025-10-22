@@ -594,7 +594,15 @@
   ],
   "keishitsu": [
   {
-      "fieldName": "計量器概論：用語",
+      "fieldName": "計量器概論：零位法・偏位法・補償法",
+      "questions": [
+        { "edition": "72", "pageNum": "1" },
+        { "edition": "73", "pageNum": "1" },
+        { "edition": "74", "pageNum": "1" }
+      ]
+  },
+    {
+      "fieldName": "計量器概論：その他用語",
       "questions": [
         { "edition": "74", "pageNum": "5" },
         { "edition": "75", "pageNum": "6" }
@@ -635,14 +643,6 @@
       "fieldName": "計量器概論：PID制御",
       "questions": [
         { "edition": "74", "pageNum": "11" }
-      ]
-    },
-    {
-      "fieldName": "計量器概論：零位法・偏位法・補償法",
-      "questions": [
-        { "edition": "72", "pageNum": "1" },
-        { "edition": "73", "pageNum": "1" },
-        { "edition": "74", "pageNum": "1" }
       ]
     }
   ]
