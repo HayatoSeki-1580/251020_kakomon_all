@@ -29,7 +29,7 @@ const goBtnField = document.getElementById('go-btn-field');
 const resultAreaField = document.getElementById('result-area-field');
 const scoreCorrectField = panelByField.querySelector('.score-correct');
 const showResultsBtnField = document.getElementById('show-results-btn-field');
-const answerButtons = document.querySelectorAll('.answer-btn'); // ここで一度取得
+const answerButtons = document.querySelectorAll('.answer-btn'); // 全ボタンを取得
 const questionSource = document.getElementById('question-source');
 const resultsSummary = document.getElementById('results-summary');
 const resultsList = document.getElementById('results-list');
@@ -82,6 +82,9 @@ async function setupEditionSelector() {
             option.textContent = info.displayText;
             editionSelect.appendChild(option);
         });
+        if (editionSelect.options.length > 0) {
+            // currentEdition は goBtnEdition クリック時に設定
+        }
     } catch (error) { console.error("❌ editions.json読込エラー:", error); }
 }
 
@@ -91,7 +94,7 @@ async function loadFieldsData() {
         const response = await fetch('./data/fields.json');
         if (!response.ok) throw new Error('HTTPエラー');
         fieldsData = await response.json();
-        populateFieldSelector();
+        populateFieldSelector(); // 初期科目で分野を生成
     } catch (error) { console.error("❌ fields.json読込エラー:", error); }
 }
 
@@ -110,7 +113,7 @@ async function loadAnswersForEdition(edition) {
 
 /** PDFを読み込んで表示する */
 async function renderPdf(edition, subject, pageNum = 1) {
-    currentPageNum = pageNum;
+    currentPageNum = pageNum; // 常にPDFのページ番号を保持
     const url = `./pdf/${edition}/${edition}_${subject}.pdf`;
     const loadingTaskOptions = { cMapUrl: './lib/pdfjs/web/cmaps/', cMapPacked: true, standardFontDataUrl: './lib/pdfjs/web/standard_fonts/' };
 
@@ -168,8 +171,12 @@ async function renderPageInternal(pdfPageNum) {
 
         // --- 表示更新 ---
         let currentQuestionId;
+        let questionEdition, questionSubject, questionPageNum; // 履歴復元用に変数定義を移動
         if (currentFieldQuestions.length > 0) {
             const question = currentFieldQuestions[currentFieldIndex];
+            questionEdition = question.edition;
+            questionSubject = subjectSelectField.value;
+            questionPageNum = question.pageNum;
             pageNumSpan.textContent = currentFieldIndex + 1; // 連番表示
             let editionDisplayText = `第${question.edition}回`;
              for (let i = 0; i < editionSelect.options.length; i++) {
@@ -181,6 +188,9 @@ async function renderPageInternal(pdfPageNum) {
             questionSource.style.display = 'inline';
             currentQuestionId = getQuestionId(question.edition, subjectSelectField.value, question.pageNum);
         } else {
+            questionEdition = editionSelect.value;
+            questionSubject = subjectSelectEdition.value;
+            questionPageNum = pdfPageNum; // 回数別ではpdfPageNumが問番号
             pageNumSpan.textContent = pdfPageNum; // 問番号表示
             questionSource.style.display = 'none';
             currentQuestionId = getQuestionId(editionSelect.value, subjectSelectEdition.value, pdfPageNum);
@@ -204,10 +214,11 @@ async function renderPageInternal(pdfPageNum) {
                 resultArea.className = 'result-area correct';
             } else {
                 if(selectedButton) selectedButton.classList.add('incorrect-selection');
-                if(correctButton) correctButton.classList.add('correct-answer');
+                if(correctButton) correctButton.classList.add('correct-answer'); // 正解ボタンを強調
                 resultArea.textContent = `不正解... (正解は ${history.correctAnswer}) ❌`;
                 resultArea.className = 'result-area incorrect';
             }
+            // 解答済みのボタンを無効化
             activeAnswerButtons.forEach(btn => { btn.disabled = true; btn.classList.add('disabled'); });
         }
 
@@ -250,10 +261,10 @@ function updateScoreDisplay() {
 
 /** 正誤を判定して結果を表示する */
 function checkAnswer(selectedChoice) {
-    const questionId = getCurrentQuestionId();
+    const questionId = getCurrentQuestionId(); // 現在表示中の問題IDを取得
     const resultArea = currentFieldQuestions.length > 0 ? resultAreaField : resultAreaEdition;
     const activePanel = currentFieldQuestions.length > 0 ? panelByField : panelByEdition;
-    const activeAnswerButtons = activePanel.querySelectorAll('.answer-btn');
+    const activeAnswerButtons = activePanel.querySelectorAll('.answer-btn'); // アクティブパネル内のボタン
 
     if (answerHistory[questionId]) { return; } // 解答済み
 
@@ -292,7 +303,7 @@ function checkAnswer(selectedChoice) {
     } else {
         resultArea.textContent = `不正解... (正解は ${correctAnswer}) ❌`; resultArea.className = 'result-area incorrect';
         if (selectedButton) selectedButton.classList.add('incorrect-selection');
-        if (correctButton) correctButton.classList.add('correct-answer');
+        if (correctButton) correctButton.classList.add('correct-answer'); // 不正解時に正解ボタンを強調
     }
 
     activeAnswerButtons.forEach(btn => { btn.disabled = true; btn.classList.add('disabled'); });
@@ -374,6 +385,7 @@ tabByEdition.addEventListener('click', () => {
 tabByField.addEventListener('click', () => {
     tabByField.classList.add('active'); tabByEdition.classList.remove('active');
     panelByField.classList.remove('hidden'); panelByEdition.classList.add('hidden');
+    // 分野別タブを開いただけでは出典はまだ表示しない
 });
 
 goBtnEdition.addEventListener('click', async () => {
