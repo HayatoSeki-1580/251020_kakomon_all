@@ -222,32 +222,42 @@
     }
   ],
 "kanbutsu": [
-    {
-      "fieldName": "法規",
+  {
+      "fieldName": "環境基本法",
       "questions": [
         { "edition": "75", "pageNum": "1" },
+        { "edition": "74", "pageNum": "1" },
+        { "edition": "73", "pageNum": "1" },
+        { "edition": "72", "pageNum": "1" },
+        { "edition": "71", "pageNum": "1" }
+      ]
+    },  
+  {
+      "fieldName": "騒音規制法",
+      "questions": [
         { "edition": "75", "pageNum": "2" },
         { "edition": "75", "pageNum": "3" },
-        { "edition": "75", "pageNum": "4" },
-        { "edition": "75", "pageNum": "5" },
-        { "edition": "74", "pageNum": "1" },
         { "edition": "74", "pageNum": "2" },
         { "edition": "74", "pageNum": "3" },
-        { "edition": "74", "pageNum": "4" },
-        { "edition": "74", "pageNum": "5" },
-        { "edition": "73", "pageNum": "1" },
         { "edition": "73", "pageNum": "2" },
         { "edition": "73", "pageNum": "3" },
-        { "edition": "73", "pageNum": "4" },
-        { "edition": "73", "pageNum": "5" },
-        { "edition": "72", "pageNum": "1" },
         { "edition": "72", "pageNum": "2" },
         { "edition": "72", "pageNum": "3" },
+        { "edition": "71", "pageNum": "2" },
+        { "edition": "71", "pageNum": "3" }
+      ]
+    },
+  {
+      "fieldName": "振動規制法",
+      "questions": [
+        { "edition": "75", "pageNum": "4" },
+        { "edition": "75", "pageNum": "5" },
+        { "edition": "74", "pageNum": "4" },
+        { "edition": "74", "pageNum": "5" },
+        { "edition": "73", "pageNum": "4" },
+        { "edition": "73", "pageNum": "5" },
         { "edition": "72", "pageNum": "4" },
         { "edition": "72", "pageNum": "5" },
-        { "edition": "71", "pageNum": "1" },
-        { "edition": "71", "pageNum": "2" },
-        { "edition": "71", "pageNum": "3" },
         { "edition": "71", "pageNum": "4" },
         { "edition": "71", "pageNum": "5" }
       ]
