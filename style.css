@@ -97,31 +97,31 @@ select { /* 標準のselectタグのスタイル */
     min-width: 100px; /* 最小幅 */
 }
 
-/* ======== カスタムプルダウンのスタイル (オーバーフロー最終FIX版) ======== */
+/* ======== カスタムプルダウンのスタイル (z-index削除・overflow削除) ======== */
 .custom-select {
     position: relative;
-    flex-grow: 1; /* 親要素内でスペースを埋める */
-    min-width: 0; /* flexアイテムが縮小できるように */
+    flex-grow: 1;
+    min-width: 0;
     font-size: 1em;
-    overflow: hidden; /* この要素自体もはみ出しを許さない */
+    /* overflow: hidden; */ /* ← 削除 */
 }
 
 .select-selected {
-    display: block; /* ブロック要素に */
+    display: block;
     background-color: #fff;
-    padding: 0.5em 30px 0.5em 0.5em; /* 右側に矢印用のスペースを確保 */
+    padding: 0.5em 30px 0.5em 0.5em;
     border: 1px solid #ccc;
     border-radius: 4px;
     cursor: pointer;
-    white-space: nowrap; /* 折り返さない */
-    overflow: hidden; /* はみ出した部分を隠す */
-    text-overflow: ellipsis; /* 省略記号(...)を表示 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     height: 2.2em;
     box-sizing: border-box;
-    line-height: 1.2em; /* 縦位置調整 */
-    position: relative;
-    width: 100%; /* 親(.custom-select)の幅に合わせる */
-    z-index: 2; /* 選択肢リストより手前に */
+    line-height: 1.2em;
+    position: relative; /* 矢印の位置基準のため残す */
+    width: 100%;
+    /* z-index: 2; */ /* ← 削除 */
 }
 .select-selected:after { /* 矢印 */
     content: "";
@@ -131,7 +131,7 @@ select { /* 標準のselectタグのスタイル */
     transform: translateY(-50%);
     width: 0; height: 0; border: 5px solid transparent;
     border-color: #555 transparent transparent transparent;
-    z-index: 3; /* さらに手前に */
+    /* z-index: 3; */ /* ← 削除 */
 }
 .select-selected.select-arrow-active:after {
     border-color: transparent transparent #555 transparent;
@@ -274,4 +274,3 @@ select { /* 標準のselectタグのスタイル */
     .source-info { margin-left: 0; margin-top: 0.5em; width: 100%; text-align: right; }
     #results-list th, #results-list td { padding: 0.4em; font-size: 0.8em; }
 }
-
