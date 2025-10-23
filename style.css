@@ -6,27 +6,29 @@ body {
     padding: 1em;
     background-color: #f4f4f9;
     color: #333;
-    overflow-x: hidden; /* 横スクロールを禁止 */
+    /* ★★★ アプリ全体の横幅をビューポートに固定し、はみ出しを完全に防ぐ */
+    overflow-x: hidden;
 }
 h1 {
     color: #444;
-    text-align: center; /* 中央揃え */
+    text-align: center;
     margin-bottom: 1em;
 }
 
 /* ======== 主要コンテナのレスポンシブ設定 ======== */
 .control-panel, .navigation, .viewer-container, #results-panel {
-    width: 100%; /* 基本は画面幅いっぱいに */
-    max-width: 800px; /* PCでの最大幅 */
+    /* ★★★ すべての主要コンテナの幅計算の基準を統一 */
+    width: 100%;
+    max-width: 800px;
     margin-left: auto;
     margin-right: auto;
-    box-sizing: border-box; /* paddingを含めて幅計算 */
+    box-sizing: border-box;
 }
 
 /* ======== タブのスタイル ======== */
 .mode-tabs {
     display: flex;
-    justify-content: center; /* 中央揃え */
+    justify-content: center;
     width: 100%;
     max-width: 800px;
     margin-left: auto;
@@ -48,6 +50,10 @@ h1 {
     text-align: center;
     flex-grow: 1;
     max-width: 200px;
+    /* ★★★ テキストがボタン幅を超えた場合に省略する設定を追加 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .tab-btn.active {
     background-color: #fff;
@@ -79,29 +85,30 @@ h1 {
 .select-group {
     display: flex;
     align-items: center;
-    flex: 1;
-    min-width: 0;
+    flex: 1 1 auto; /* ★★★ 伸縮の挙動をより柔軟に */
+    min-width: 0;   /* ★★★ コンテンツに引きずられないための最重要設定 */
 }
 .select-group label {
     margin-right: 0.5em;
     font-weight: bold;
     white-space: nowrap;
+    flex-shrink: 0; /* ラベルが縮まないようにする */
 }
-select { /* 標準のselectタグのスタイル */
+select {
     padding: 0.5em;
     border-radius: 4px;
     border: 1px solid #ccc;
     background-color: #fff;
     flex-grow: 1;
-    width: auto;
-    min-width: 100px;
+    width: 100%; /* 幅を100%に */
+    min-width: 0;  /* 最小幅の制限を解除 */
 }
 
 /* ======== カスタムプルダウンのスタイル ======== */
 .custom-select {
     position: relative;
-    flex: 1;
-    min-width: 0;
+    flex: 1 1 auto; /* ★★★ 伸縮の挙動をより柔軟に */
+    min-width: 0;   /* ★★★ コンテンツに引きずられないための最重要設定 */
     font-size: 1em;
 }
 
@@ -117,12 +124,12 @@ select { /* 標準のselectタグのスタイル */
     line-height: 1.2em;
     position: relative;
     width: 100%;
-    /* ★★★【元に戻す】前回の文字数制限を撤廃し、元のデザインに戻す */
+    /* ★★★ テキストの強制省略設定。これによりプルダウンの大きさは不変になる */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.select-selected:after { /* 矢印 */
+.select-selected:after {
     content: "";
     position: absolute;
     top: 50%;
@@ -167,19 +174,10 @@ select { /* 標準のselectタグのスタイル */
 .select-items div:last-child { border-bottom: none; }
 .select-hide { display: none; }
 .select-items div:hover { background-color: #007bff; color: white; }
-.select-items div:hover .freq-bar-container { background-color: #e9ecef; }
-.select-items div:hover .freq-bar { opacity: 0.8; }
 .same-as-selected { background-color: #f8f9fa !important; color: #333 !important; font-weight: bold; }
-.same-as-selected .freq-bar-container { background-color: #e9ecef !important; }
-.same-as-selected .freq-bar { opacity: 1 !important; }
 .freq-bar-container {
-    margin-left: auto;
-    width: 50px;
-    height: 10px;
-    background-color: #e9ecef;
-    border-radius: 2px;
-    overflow: hidden;
-    flex-shrink: 0;
+    margin-left: auto; width: 50px; height: 10px; background-color: #e9ecef;
+    border-radius: 2px; overflow: hidden; flex-shrink: 0;
 }
 .freq-bar { display: block; height: 100%; border-radius: 2px; transition: width 0.3s ease; }
 .freq-high { background-color: #e74c3c; }
@@ -189,26 +187,36 @@ select { /* 標準のselectタグのスタイル */
 
 /* ======== ナビゲーションエリア ======== */
 .navigation {
-    display: flex; flex-wrap: wrap; align-items: center; gap: 0.8em;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5em 0.8em; /* ★★★ 縦横の隙間を調整 */
     margin-bottom: 1em;
 }
-.navigation button, #go-btn-edition, #go-btn-field {
+.navigation button {
     padding: 0.5em 1em; border: none; background-color: #007bff; color: white;
     border-radius: 4px; cursor: pointer; transition: background-color 0.2s;
     flex-shrink: 0;
 }
 .navigation button:disabled { background-color: #ccc; cursor: not-allowed; }
-.navigation button:hover:not(:disabled), #go-btn-edition:hover, #go-btn-field:hover { background-color: #0056b3; }
+.navigation button:hover:not(:disabled) { background-color: #0056b3; }
 #page-indicator { font-size: 1.1em; font-weight: bold; min-width: 60px; text-align: center; }
 .jump-select { width: 90px; flex-shrink: 0; }
 .source-info {
-    font-size: 0.9em; color: #555; font-weight: bold; margin-left: auto; /* PCでは右寄せ */
-    padding: 0.5em; background-color: #e9ecef; border-radius: 4px; display: none;
-    /* ★★★【重要】テキストの折り返しを許可する */
+    font-size: 0.9em; color: #555; font-weight: bold;
+    padding: 0.5em; background-color: #e9ecef; border-radius: 4px;
+    display: none;
+    /* ★★★ はみ出しの主原因だった設定を修正 */
     white-space: normal;
+    text-align: right;
+    /* ★★★ PCでは右寄せ、スマホでは幅いっぱいに広がるように設定 */
+    margin-left: auto;
+    flex-basis: 100%;
+    margin-top: 0.5em;
 }
 
-/* --- 省略 (以降のスタイルは変更なし) --- */
+
+/* --- 省略 (PDF表示エリア以降のスタイルは変更なし) --- */
 
 /* ======== 汎用クラス ======== */
 .hidden { display: none !important; }
@@ -218,7 +226,11 @@ select { /* 標準のselectタグのスタイル */
     body { padding: 0.5em; }
     h1 { font-size: 1.5em; }
     .control-panel, .navigation, .viewer-container, #results-panel { padding: 0.8em; }
-    .select-group { min-width: calc(50% - 1em); }
+    .select-group {
+        /* ★★★ スマホではプルダウンが縦に並ぶように */
+        min-width: 100%;
+        flex-basis: 100%;
+    }
     .custom-select { width: 100%; }
     .answer-btn { width: 38px; height: 38px; font-size: 1em; }
     .actions-row { flex-direction: column; align-items: flex-start; }
@@ -226,14 +238,8 @@ select { /* 標準のselectタグのスタイル */
     .result-area { margin-top: 0.5em; }
     .navigation { gap: 0.5em; }
     .source-info {
-        /* ★★★【重要】スマホでは幅100%を使い、右寄せにする */
-        margin-left: 0;
-        margin-top: 0.5em;
-        width: 100%;
-        text-align: right;
+        margin-left: 0; /* 右寄せをリセット */
     }
     #results-list th, #results-list td { padding: 0.4em; font-size: 0.8em; }
-    .freq-bar-container {
-        display: none; /* カラーバーは非表示のまま */
-    }
+    .freq-bar-container { display: none; }
 }
