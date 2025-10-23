@@ -97,30 +97,31 @@ select { /* 標準のselectタグのスタイル */
     min-width: 100px; /* 最小幅 */
 }
 
-/* ======== カスタムプルダウンのスタイル (オーバーフロー最終FIX版) ======== */
+/* ======== カスタムプルダウンのスタイル (z-index調整版) ======== */
 .custom-select {
     position: relative;
-    flex-grow: 1; /* 親要素内でスペースを埋める */
-    min-width: 0; /* flexアイテムが縮小できるように */
+    flex-grow: 1;
+    min-width: 0;
     font-size: 1em;
-    overflow: hidden; /* この要素自体もはみ出しを許さない */
+    /* overflow: hidden; */ /* 一旦コメントアウトして原因を切り分け */
 }
 
 .select-selected {
-    display: block; /* ブロック要素に */
+    display: block;
     background-color: #fff;
-    padding: 0.5em 30px 0.5em 0.5em; /* 右側に矢印用のスペースを確保 */
+    padding: 0.5em 30px 0.5em 0.5em;
     border: 1px solid #ccc;
     border-radius: 4px;
     cursor: pointer;
-    white-space: nowrap; /* 折り返さない */
-    overflow: hidden; /* はみ出した部分を隠す */
-    text-overflow: ellipsis; /* 省略記号(...)を表示 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     height: 2.2em;
     box-sizing: border-box;
-    line-height: 1.2em; /* 縦位置調整 */
-    position: relative;
-    width: 100%; /* 親(.custom-select)の幅に合わせる */
+    line-height: 1.2em;
+    position: relative; /* z-indexを有効にするため */
+    width: 100%;
+    z-index: 2; /* ★追加: 選択肢リストより手前に */
 }
 .select-selected:after { /* 矢印 */
     content: "";
@@ -130,6 +131,7 @@ select { /* 標準のselectタグのスタイル */
     transform: translateY(-50%);
     width: 0; height: 0; border: 5px solid transparent;
     border-color: #555 transparent transparent transparent;
+    z-index: 3; /* さらに手前に */
 }
 .select-selected.select-arrow-active:after {
     border-color: transparent transparent #555 transparent;
