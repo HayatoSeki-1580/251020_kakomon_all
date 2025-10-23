@@ -79,7 +79,7 @@ h1 {
 .select-group {
     display: flex; /* ラベルとセレクトを横並び */
     align-items: center;
-    flex: 1; /* ★★★【修正点】flex-grow: 1; から変更。flex-basisを0にしてコンテンツ幅を無視させる */
+    flex: 1;
     min-width: 0;
 }
 .select-group label {
@@ -97,10 +97,10 @@ select { /* 標準のselectタグのスタイル */
     min-width: 100px; /* 最小幅 */
 }
 
-/* ======== カスタムプルダウンのスタイル (z-index削除・overflow削除) ======== */
+/* ======== カスタムプルダウンのスタイル ======== */
 .custom-select {
     position: relative;
-    flex: 1; /* ★★★【修正点】flex-grow: 1; から変更。こちらも同様に指定 */
+    flex: 1;
     min-width: 0;
     font-size: 1em;
 }
@@ -118,7 +118,7 @@ select { /* 標準のselectタグのスタイル */
     height: 2.2em;
     box-sizing: border-box;
     line-height: 1.2em;
-    position: relative; /* 矢印の位置基準のため残す */
+    position: relative;
     width: 100%;
 }
 .select-selected:after { /* 矢印 */
@@ -136,9 +136,21 @@ select { /* 標準のselectタグのスタイル */
 }
 
 .select-items {
-    position: absolute; background-color: #fff; top: 100%; left: 0; right: 0;
-    z-index: 99; border-radius: 0 0 4px 4px; max-height: 200px; overflow-y: auto;
-    border: 1px solid #ccc; border-top: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    /* ★★★【最終修正】ここが最終的な修正箇所です ★★★ */
+    position: absolute; 
+    background-color: #fff; 
+    top: 100%; 
+    left: 0; 
+    /* right: 0; を width: 100%; に変更して幅を明示的に指定 */
+    width: 100%;
+    box-sizing: border-box; /* borderを含めて幅を計算するようにする */
+    z-index: 99; 
+    border-radius: 0 0 4px 4px; 
+    max-height: 200px; 
+    overflow-y: auto;
+    border: 1px solid #ccc; 
+    border-top: none; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 .select-items div {
     display: flex; justify-content: space-between; align-items: center;
