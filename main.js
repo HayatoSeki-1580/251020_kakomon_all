@@ -173,7 +173,7 @@ async function renderPageInternal(pdfPageNum) {
              }
             if(questionSource) {
                 questionSource.textContent = `出典: ${editionDisplayText} 問${question.pageNum}`;
-                questionSource.style.display = 'inline';
+                questionSource.style.display = 'block'; // 'inline'から変更
             }
             currentQuestionId = getQuestionId(question.edition, questionSubject, question.pageNum);
         } else {
@@ -238,14 +238,11 @@ function populateFieldSelector() {
         optionDiv.innerHTML = `<span>${field.fieldName} (${questionCount}問)</span><span class="freq-bar-container"><span class="freq-bar ${colorClass}" style="width: ${barWidthPercent}%;"></span></span>`;
         optionDiv.dataset.value = index;
         optionDiv.dataset.text = `${field.fieldName} (${questionCount}問)`;
-       optionDiv.addEventListener('click', function(e) {
+        optionDiv.addEventListener('click', function(e) {
             e.stopPropagation();
-            
-            // ★★★【変更】元のテキストをdatasetに保存し、テキスト設定は新関数に任せる
-            selectSelected.dataset.fullText = this.dataset.text; // 元のテキストを保存
+            // ★★★【元に戻す】元のシンプルなテキスト設定に戻す
+            selectSelected.textContent = this.dataset.text;
             selectSelected.dataset.value = this.dataset.value;
-            truncateSelectedText(); // 新しい関数を呼び出して表示を更新
-
             closeCustomSelect();
             const currentSelected = selectItems.querySelector('.same-as-selected');
             if (currentSelected) currentSelected.classList.remove('same-as-selected');
@@ -408,33 +405,7 @@ function closeCustomSelect() {
     if(selectItems) selectItems.classList.add('select-hide');
     if(selectSelected) selectSelected.classList.remove('select-arrow-active');
 }
-// ★★★【追加】画面サイズに応じて選択されたテキストを短縮する新関数 ★★★
-function truncateSelectedText() {
-    if (!selectSelected || !selectSelected.dataset.fullText) {
-        return; // 対象要素や元のテキストがなければ何もしない
-    }
 
-    const fullText = selectSelected.dataset.fullText;
-    const screenWidth = window.innerWidth;
-    let maxLength;
-
-    // 画面幅に応じて最大文字数を設定
-    if (screenWidth < 400) {
-        maxLength = 15; // スマホ（縦）など
-    } else if (screenWidth < 600) {
-        maxLength = 25; // スマホ（横）など
-    } else {
-        selectSelected.textContent = fullText; // PCサイズでは制限しない
-        return;
-    }
-
-    // 文字数が制限を超えていたら短縮
-    if (fullText.length > maxLength) {
-        selectSelected.textContent = fullText.substring(0, maxLength) + '...';
-    } else {
-        selectSelected.textContent = fullText;
-    }
-}
 // --- イベントリスナー設定関数 ---
 function setupEventListeners() {
     answerButtonsNodeList = document.querySelectorAll('.answer-btn');
@@ -479,7 +450,7 @@ function setupEventListeners() {
         const subject = subjectSelectField ? subjectSelectField.value : '';
         const fieldIndex = selectSelected ? selectSelected.dataset.value : ''; // カスタムプルダウンから取得
         if (fieldIndex === "" || !fieldsData[subject] || !fieldsData[subject][fieldIndex]) {
-             alert("分野を選択してください。"); return;
+            alert("分野を選択してください。"); return;
         }
         currentFieldQuestions = fieldsData[subject][fieldIndex].questions;
         currentFieldIndex = 0;
@@ -553,8 +524,6 @@ function setupEventListeners() {
         // すべてのカスタムセレクトを閉じる
         closeCustomSelect();
     });
-    // ★★★【追加】ウィンドウのリサイズを監視してテキストを更新
-    window.addEventListener('resize', truncateSelectedText);
 }
 
 /** 初期化処理 */
@@ -625,4 +594,3 @@ async function initialize() {
 
 // --- アプリケーションの実行 ---
 document.addEventListener('DOMContentLoaded', initialize);
-
