@@ -76,31 +76,34 @@ h1 {
 .actions-row {
     justify-content: space-between;
 }
-
-/* ★★★【最終修正】レイアウトシステムをGridに変更し、デザインを復元 ★★★ */
 .select-group {
-    display: grid; /* レイアウトをGridに変更 */
-    grid-template-columns: auto 1fr; /* 1列目:ラベル幅、2列目:残り全部 */
-    gap: 0.5em; /* ラベルとプルダウンの隙間 (元のmargin-right: 0.5emを再現) */
+    display: grid; /* ラベルとセレクトを横並び */
     align-items: center;
-    /* 親要素(.top-row)内での挙動は元のflex設定を維持 */
-    flex-grow: 1;
-    min-width: 200px;
+    flex-grow: 1; /* 横幅いっぱいに広がる */
+    /* ★★★【最重要】この一行が全ての原因を解決します ★★★ */
+    /* これにより、コンテナは中身のテキストの長さに影響されず、与えられた幅を維持します。 */
+    min-width: 0;
 }
 .select-group label {
-    /* margin-rightはgapで管理するため不要 */
+    margin-right: 0.5em;
     font-weight: bold;
     white-space: nowrap;
 }
-select, .custom-select {
-    width: 100%; /* Gridセルの中で100%広がる */
-    min-width: 0;  /* 縮小を許可するおまじない */
+select { /* 標準のselectタグのスタイル */
+    padding: 0.5em;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    flex-grow: 1;
+    width: auto;
+    min-width: 100px;
 }
-
 
 /* ======== カスタムプルダウンのスタイル ======== */
 .custom-select {
     position: relative;
+    flex-grow: 1;
+    min-width: 0;
     font-size: 1em;
 }
 
@@ -116,10 +119,10 @@ select, .custom-select {
     line-height: 1.2em;
     position: relative;
     width: 100%;
-    /* サイズを不変にするための3点セット */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    /* ★★★ プルダウンのサイズを不変にするための3点セット ★★★ */
+    white-space: nowrap;     /* 1. テキストを折り返さない */
+    overflow: hidden;        /* 2. はみ出した部分を隠す */
+    text-overflow: ellipsis; /* 3. 隠れた部分を「...」で表示 */
 }
 .select-selected:after { /* 矢印 */
     content: "";
@@ -160,7 +163,7 @@ select, .custom-select {
 .freq-low { background-color: #2ecc71; }
 
 
-/* --- 省略 (以降のスタイルは初期状態のままなので変更不要) --- */
+/* --- 省略 (以降のスタイルは変更の必要がないため、元のままで問題ありません) --- */
 
 /* ======== 汎用クラス ======== */
 .hidden { display: none !important; }
@@ -170,9 +173,8 @@ select, .custom-select {
     body { padding: 0.5em; }
     h1 { font-size: 1.5em; }
     .control-panel, .navigation, .viewer-container, #results-panel { padding: 0.8em; }
-    .select-group {
-        flex-basis: 100%; /* スマホでは一行を専有するようにする */
-    }
+    .select-group { min-width: calc(50% - 1em); }
+    .custom-select { width: 100%; }
     .answer-btn { width: 38px; height: 38px; font-size: 1em; }
     .actions-row { flex-direction: column; align-items: flex-start; }
     .score-counter, .results-btn, .result-area { width: 100%; text-align: left; margin-left: 0; }
