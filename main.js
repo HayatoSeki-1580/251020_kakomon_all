@@ -22,6 +22,7 @@ let currentFieldIndex = 0;
 let correctCount = 0;
 let answerHistory = {};
 let currentSessionQuestions = [];
+// currentSubject と currentEdition は initialize または goBtn クリック時に設定
 
 /** ローディング表示を制御する関数 */
 function showLoading(show) {
@@ -36,6 +37,7 @@ function getQuestionId(edition, subject, pageNum) {
 
 /** 現在の問題情報から一意なIDを生成するヘルパー関数 */
 function getCurrentQuestionId() {
+    // 要素の存在を確認してから値を取得
     const currentSubjectVal = subjectSelectEdition ? subjectSelectEdition.value : '';
     const currentEditionVal = editionSelect ? editionSelect.value : '';
     const currentFieldSubjectVal = subjectSelectField ? subjectSelectField.value : '';
@@ -70,15 +72,13 @@ async function setupEditionSelector() {
 
 /** 分野別ファイル(fields.json)を読み込む */
 async function loadFieldsData() {
-    if (!customSelect) {
-        console.error("❌ カスタムセレクト要素が見つかりません (loadFieldsData)");
-        return;
-    }
+     // カスタムセレクト要素が存在するか確認
+    if (!customSelect) return;
     try {
         const response = await fetch('./data/fields.json');
         if (!response.ok) throw new Error('HTTPエラー');
         fieldsData = await response.json();
-        populateFieldSelector();
+        populateFieldSelector(); // 初期科目で分野を生成
     } catch (error) { console.error("❌ fields.json読込エラー:", error); }
 }
 
@@ -106,11 +106,11 @@ async function renderPdf(edition, subject, pageNum = 1) {
         const loadingTask = pdfjsLib.getDocument(url, loadingTaskOptions);
         pdfDoc = await loadingTask.promise;
         const totalQuestions = pdfDoc.numPages > 1 ? pdfDoc.numPages - 1 : 0;
-        if (currentFieldQuestions.length === 0) {
+        if (currentFieldQuestions.length === 0) { // 回数別モードの時のみ更新
             if(pageCountSpan) pageCountSpan.textContent = totalQuestions;
             populateJumpSelector(totalQuestions);
         }
-        await renderPageInternal(currentPageNum);
+        await renderPageInternal(currentPageNum); // 内部描画関数を呼ぶ
     } catch (error) {
         console.error("❌ PDF読込エラー:", error);
         alert(`PDFファイルが見つかりません:\n${url}`);
@@ -146,25 +146,10 @@ async function renderPageInternal(pdfPageNum) {
         activeAnswerButtons.forEach(btn => { btn.className = 'answer-btn'; btn.disabled = false; });
 
         const page = await pdfDoc.getPage(pdfPageNum + 1);
-
-        // ★★★【根本原因の修正】★★★
-        // 1. デバイスのピクセル比を取得し、高画質化
-        const devicePixelRatio = window.devicePixelRatio || 1;
-        // 2. コンテナ（canvasの親）の現在の表示幅を取得
-        const containerWidth = canvas.parentElement.clientWidth;
-        // 3. 表示幅に合わせてPDFのスケールを自動計算
-        const viewportDefault = page.getViewport({ scale: 1.0 });
-        const scale = containerWidth / viewportDefault.width;
-        const viewport = page.getViewport({ scale: scale * devicePixelRatio });
-        // 4. 計算したサイズでCanvasのサイズを設定
+        const viewport = page.getViewport({ scale: 1.8 });
         const context = canvas.getContext('2d');
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
-        // 5. CSSで表示上のサイズを調整（これにより高解像度でも表示が大きくならない）
-        canvas.style.height = `${viewport.height / devicePixelRatio}px`;
-        canvas.style.width = `${viewport.width / devicePixelRatio}px`;
-        // ★★★【ここまでが修正箇所】★★★
-
+        canvas.height = viewport.height; canvas.width = viewport.width;
+        context.clearRect(0, 0, canvas.width, canvas.height);
         await page.render({ canvasContext: context, viewport }).promise;
 
         let currentQuestionId;
@@ -185,7 +170,7 @@ async function renderPageInternal(pdfPageNum) {
              }
             if(questionSource) {
                 questionSource.textContent = `出典: ${editionDisplayText} 問${question.pageNum}`;
-                questionSource.style.display = 'block';
+                questionSource.style.display = 'inline';
             }
             currentQuestionId = getQuestionId(question.edition, questionSubject, question.pageNum);
         } else {
@@ -226,34 +211,51 @@ async function renderPageInternal(pdfPageNum) {
 }
 
 
-/** 分野別プルダウンを生成する (カスタム版) */
+/** 分野別プルダウンを生成する (カスタム版・復活) */
 function populateFieldSelector() {
-    if (!subjectSelectField || !selectItems || !selectSelected) { return; }
+    // 必要な要素が存在するか確認
+    if (!subjectSelectField || !selectItems || !selectSelected) return;
+
     const subject = subjectSelectField.value;
     const fields = fieldsData[subject] || [];
-    selectItems.innerHTML = '';
+    selectItems.innerHTML = ''; // 選択肢リストをクリア
     selectSelected.textContent = fields.length > 0 ? '分野を選択...' : 'データがありません';
-    selectSelected.dataset.value = "";
+    selectSelected.dataset.value = ""; // 選択値をリセット
+
     if (fields.length === 0) return;
+
     const maxQuestions = Math.max(...fields.map(field => field.questions.length), 1);
+
     fields.forEach((field, index) => {
         const optionDiv = document.createElement('div');
         const questionCount = field.questions.length;
         const ratio = questionCount / maxQuestions;
-        let colorClass = 'freq-low';
-        if (ratio > 0.66) colorClass = 'freq-high';
-        else if (ratio > 0.33) colorClass = 'freq-medium';
-        const barWidthPercent = Math.max(Math.round(ratio * 100), 5);
-        optionDiv.innerHTML = `<span>${field.fieldName} (${questionCount}問)</span><span class="freq-bar-container"><span class="freq-bar ${colorClass}" style="width: ${barWidthPercent}%;"></span></span>`;
-        optionDiv.dataset.value = index;
-        optionDiv.dataset.text = `${field.fieldName} (${questionCount}問)`;
+
+        let colorClass = 'freq-low'; // 緑 (デフォルト)
+        if (ratio > 0.66) colorClass = 'freq-high'; // 赤 (多い)
+        else if (ratio > 0.33) colorClass = 'freq-medium'; // 黄 (中くらい)
+
+        const barWidthPercent = Math.max(Math.round(ratio * 100), 5); // バーの幅を%で計算 (最低5%)
+
+        optionDiv.innerHTML = `
+            <span>${field.fieldName} (${questionCount}問)</span>
+            <span class="freq-bar-container">
+                <span class="freq-bar ${colorClass}" style="width: ${barWidthPercent}%;"></span>
+            </span>
+        `;
+        optionDiv.dataset.value = index; // 選択肢の値 (配列のインデックス)
+        optionDiv.dataset.text = `${field.fieldName} (${questionCount}問)`; // 表示用のテキスト
+
+        // 選択肢クリック時の処理
         optionDiv.addEventListener('click', function(e) {
-            e.stopPropagation();
-            selectSelected.textContent = this.dataset.text;
-            selectSelected.dataset.value = this.dataset.value;
-            closeCustomSelect();
+            e.stopPropagation(); // ドキュメントへの伝播を止める
+            selectSelected.textContent = this.dataset.text; // 選んだテキストを表示
+            selectSelected.dataset.value = this.dataset.value; // 選んだ値を保持
+            closeCustomSelect(); // プルダウンを閉じる
+            // 以前に選択されていたものをリセット
             const currentSelected = selectItems.querySelector('.same-as-selected');
             if (currentSelected) currentSelected.classList.remove('same-as-selected');
+            // 今回選択されたものをマーク
             this.classList.add('same-as-selected');
         });
         selectItems.appendChild(optionDiv);
@@ -383,9 +385,9 @@ function showResults() {
             if (currentFieldQuestions.length > 0) {
                  if(tabByField) tabByField.click();
                  if(subjectSelectField) subjectSelectField.value = questionInfo.subject;
-                 populateFieldSelector();
+                 populateFieldSelector(); // 分野リスト再生成
                  const fieldIdx = fieldsData[questionInfo.subject]?.findIndex(f => f.questions.some(q => q.edition === questionInfo.edition && q.pageNum === questionInfo.pageNum));
-                 if(fieldIdx !== undefined && fieldIdx > -1 && selectSelected) {
+                 if(fieldIdx !== undefined && fieldIdx > -1 && selectSelected) { // カスタムセレクト用に修正
                      const targetOption = selectItems ? selectItems.querySelector(`div[data-value="${fieldIdx}"]`) : null;
                      if(targetOption){
                          selectSelected.textContent = targetOption.dataset.text;
@@ -435,7 +437,7 @@ function setupEventListeners() {
         const selectedEdition = editionSelect ? editionSelect.value : '';
         const selectedSubject = subjectSelectEdition ? subjectSelectEdition.value : '';
         currentSessionQuestions = [];
-        const url = `./pdf/${selectedEdition}/${selectedSubject}.pdf`;
+        const url = `./pdf/${selectedEdition}/${selectedEdition}_${selectedSubject}.pdf`;
         showLoading(true);
         try {
             const tempLoadingTask = pdfjsLib.getDocument(url);
@@ -456,9 +458,9 @@ function setupEventListeners() {
         if(welcomeOverlay) welcomeOverlay.style.display = 'none'; window.scrollTo(0, 0);
         correctCount = 0; updateScoreDisplay(); answerHistory = {};
         const subject = subjectSelectField ? subjectSelectField.value : '';
-        const fieldIndex = selectSelected ? selectSelected.dataset.value : '';
+        const fieldIndex = selectSelected ? selectSelected.dataset.value : ''; // カスタムプルダウンから取得
         if (fieldIndex === "" || !fieldsData[subject] || !fieldsData[subject][fieldIndex]) {
-            alert("分野を選択してください。"); return;
+             alert("分野を選択してください。"); return;
         }
         currentFieldQuestions = fieldsData[subject][fieldIndex].questions;
         currentFieldIndex = 0;
@@ -519,6 +521,7 @@ function setupEventListeners() {
         if(exerciseView) exerciseView.classList.remove('hidden');
     });
 
+    // カスタムプルダウンのイベントリスナー
     if (selectSelected) selectSelected.addEventListener('click', function(e) {
         e.stopPropagation();
         if(selectItems) selectItems.classList.toggle('select-hide');
@@ -533,6 +536,7 @@ function setupEventListeners() {
 async function initialize() {
     console.log("🔄 アプリケーションの初期化を開始...");
 
+    // --- HTML要素の取得 ---
     exerciseView = document.getElementById('exercise-view');
     resultsPanel = document.getElementById('results-panel');
     welcomeOverlay = document.getElementById('welcome-overlay');
@@ -554,23 +558,25 @@ async function initialize() {
     scoreCorrectEdition = panelByEdition ? panelByEdition.querySelector('.score-correct') : null;
     showResultsBtnEdition = document.getElementById('show-results-btn-edition');
     subjectSelectField = document.getElementById('subject-select-field');
-    customSelect = document.getElementById('field-select-custom');
+    customSelect = document.getElementById('field-select-custom'); // カスタムプルダウンに変更
     selectSelected = customSelect ? customSelect.querySelector('.select-selected') : null;
     selectItems = customSelect ? customSelect.querySelector('.select-items') : null;
     goBtnField = document.getElementById('go-btn-field');
     resultAreaField = document.getElementById('result-area-field');
     scoreCorrectField = panelByField ? panelByField.querySelector('.score-correct') : null;
     showResultsBtnField = document.getElementById('show-results-btn-field');
+    // answerButtonsNodeList は setupEventListeners で取得
     questionSource = document.getElementById('question-source');
     resultsSummary = document.getElementById('results-summary');
     resultsList = document.getElementById('results-list');
     backToExerciseBtn = document.getElementById('back-to-exercise-btn');
 
+    // 必須要素の存在チェック
     const requiredElements = {
         editionSelect, customSelect, subjectSelectField, canvas, subjectSelectEdition,
         goBtnEdition, goBtnField, prevBtn, nextBtn, jumpToSelect, tabByEdition, tabByField,
         panelByEdition, panelByField, showResultsBtnEdition, showResultsBtnField, backToExerciseBtn,
-        resultsPanel, resultsSummary, resultsList, selectSelected, selectItems
+        resultsPanel, resultsSummary, resultsList
     };
     let missingElementId = null;
     for (const id in requiredElements) {
@@ -582,12 +588,15 @@ async function initialize() {
         return;
     }
 
+    // イベントリスナーの設定
     setupEventListeners();
 
+    // 非同期処理の実行
     await setupEditionSelector();
     await loadFieldsData();
 
     console.log("✅ 初期化完了。");
 }
 
+// --- アプリケーションの実行 ---
 document.addEventListener('DOMContentLoaded', initialize);
