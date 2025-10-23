@@ -80,7 +80,7 @@ h1 {
     display: flex;
     align-items: center;
     flex: 1;
-    min-width: 0; /* ★★★ コンテナがコンテンツに引きずられないようにするための重要設定 */
+    min-width: 0;
 }
 .select-group label {
     margin-right: 0.5em;
@@ -117,7 +117,7 @@ select { /* 標準のselectタグのスタイル */
     line-height: 1.2em;
     position: relative;
     width: 100%;
-    /* ★★★ テキストの強制省略設定。これによりプルダウンの大きさは不変になる */
+    /* ★★★【元に戻す】前回の文字数制限を撤廃し、元のデザインに戻す */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -141,7 +141,7 @@ select { /* 標準のselectタグのスタイル */
     background-color: #fff;
     top: 100%;
     left: 0;
-    width: 100%; /* 親要素の幅に完全に追従 */
+    width: 100%;
     box-sizing: border-box;
     z-index: 99;
     border-radius: 0 0 4px 4px;
@@ -162,7 +162,7 @@ select { /* 標準のselectタグのスタイル */
     overflow-wrap: break-word;
     text-align: left;
     line-height: 1.3;
-    min-width: 0; /* テキストの折り返しを確実にする */
+    min-width: 0;
 }
 .select-items div:last-child { border-bottom: none; }
 .select-hide { display: none; }
@@ -187,6 +187,27 @@ select { /* 標準のselectタグのスタイル */
 .freq-low { background-color: #2ecc71; }
 
 
+/* ======== ナビゲーションエリア ======== */
+.navigation {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0.8em;
+    margin-bottom: 1em;
+}
+.navigation button, #go-btn-edition, #go-btn-field {
+    padding: 0.5em 1em; border: none; background-color: #007bff; color: white;
+    border-radius: 4px; cursor: pointer; transition: background-color 0.2s;
+    flex-shrink: 0;
+}
+.navigation button:disabled { background-color: #ccc; cursor: not-allowed; }
+.navigation button:hover:not(:disabled), #go-btn-edition:hover, #go-btn-field:hover { background-color: #0056b3; }
+#page-indicator { font-size: 1.1em; font-weight: bold; min-width: 60px; text-align: center; }
+.jump-select { width: 90px; flex-shrink: 0; }
+.source-info {
+    font-size: 0.9em; color: #555; font-weight: bold; margin-left: auto; /* PCでは右寄せ */
+    padding: 0.5em; background-color: #e9ecef; border-radius: 4px; display: none;
+    /* ★★★【重要】テキストの折り返しを許可する */
+    white-space: normal;
+}
+
 /* --- 省略 (以降のスタイルは変更なし) --- */
 
 /* ======== 汎用クラス ======== */
@@ -204,11 +225,15 @@ select { /* 標準のselectタグのスタイル */
     .score-counter, .results-btn, .result-area { width: 100%; text-align: left; margin-left: 0; }
     .result-area { margin-top: 0.5em; }
     .navigation { gap: 0.5em; }
-    .source-info { margin-left: 0; margin-top: 0.5em; width: 100%; text-align: right; }
+    .source-info {
+        /* ★★★【重要】スマホでは幅100%を使い、右寄せにする */
+        margin-left: 0;
+        margin-top: 0.5em;
+        width: 100%;
+        text-align: right;
+    }
     #results-list th, #results-list td { padding: 0.4em; font-size: 0.8em; }
-
-    /* ★★★ スマホサイズでカラーバーを非表示にする */
     .freq-bar-container {
-        display: none;
+        display: none; /* カラーバーは非表示のまま */
     }
 }
