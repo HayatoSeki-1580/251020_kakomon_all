@@ -77,24 +77,24 @@ h1 {
     justify-content: space-between;
 }
 
-/* ★★★ デザイン復元 + 機能維持 ★★★ */
+/* ★★★【最終修正】レイアウトシステムをGridに変更し、デザインを復元 ★★★ */
 .select-group {
-    display: flex; /* 元の横並びレイアウトに戻す */
+    display: grid; /* レイアウトをGridに変更 */
+    grid-template-columns: auto 1fr; /* 1列目:ラベル幅、2列目:残り全部 */
+    gap: 0.5em; /* ラベルとプルダウンの隙間 (元のmargin-right: 0.5emを再現) */
     align-items: center;
-    flex-grow: 1; /* 横幅いっぱいに広がる */
-    min-width: 200px; /* 折り返し時の最小幅を元に戻す */
+    /* 親要素(.top-row)内での挙動は元のflex設定を維持 */
+    flex-grow: 1;
+    min-width: 200px;
 }
 .select-group label {
-    margin-right: 0.5em; /* 元の隙間設定に戻す */
+    /* margin-rightはgapで管理するため不要 */
     font-weight: bold;
     white-space: nowrap;
 }
 select, .custom-select {
-    flex-grow: 1; /* 横幅いっぱいに広がる */
-    width: auto; /* width指定を解除 */
-    /* ★★★ 機能の核となる重要設定 ★★★ */
-    /* これにより、中身のテキストの長さに影響されず、コンテナが正しく縮小します */
-    min-width: 0;
+    width: 100%; /* Gridセルの中で100%広がる */
+    min-width: 0;  /* 縮小を許可するおまじない */
 }
 
 
@@ -170,8 +170,9 @@ select, .custom-select {
     body { padding: 0.5em; }
     h1 { font-size: 1.5em; }
     .control-panel, .navigation, .viewer-container, #results-panel { padding: 0.8em; }
-    .select-group { min-width: calc(50% - 1em); }
-    .custom-select { width: 100%; }
+    .select-group {
+        flex-basis: 100%; /* スマホでは一行を専有するようにする */
+    }
     .answer-btn { width: 38px; height: 38px; font-size: 1em; }
     .actions-row { flex-direction: column; align-items: flex-start; }
     .score-counter, .results-btn, .result-area { width: 100%; text-align: left; margin-left: 0; }
