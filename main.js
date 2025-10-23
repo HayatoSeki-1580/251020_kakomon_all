@@ -1,4 +1,4 @@
-// --- モジュールのインポート ---
+// --- モジュールのインポート --
 import * as pdfjsLib from './lib/pdfjs/build/pdf.mjs';
 pdfjsLib.GlobalWorkerOptions.workerSrc = './lib/pdfjs/build/pdf.worker.mjs';
 
