@@ -140,7 +140,7 @@ function populateJumpSelector(totalQuestions) {
     }
 }
 
-/** 指定されたページを描画する（内部関数） */
+// ★★★【最終修正】PDF描画関数を全面的に刷新 ★★★
 async function renderPageInternal(pdfPageNum) {
     if (!pdfDoc || !canvas) return;
     try {
@@ -149,10 +149,21 @@ async function renderPageInternal(pdfPageNum) {
         activeAnswerButtons.forEach(btn => { btn.className = 'answer-btn'; btn.disabled = false; });
 
         const page = await pdfDoc.getPage(pdfPageNum + 1);
-        const viewport = page.getViewport({ scale: 1.8 });
+
+        // 1. コンテナの現在の表示幅を取得
+        const containerWidth = canvas.clientWidth;
+
+        // 2. 表示幅に合わせてPDFのスケールを計算
+        const viewportDefault = page.getViewport({ scale: 1.0 });
+        const scale = containerWidth / viewportDefault.width;
+        const viewport = page.getViewport({ scale: scale });
+
+        // 3. 計算したスケールでCanvasの物理的なサイズを設定
         const context = canvas.getContext('2d');
-        canvas.height = viewport.height; canvas.width = viewport.width;
-        context.clearRect(0, 0, canvas.width, canvas.height);
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        // 4. CanvasにPDFを描画
         await page.render({ canvasContext: context, viewport }).promise;
 
         let currentQuestionId;
@@ -173,7 +184,7 @@ async function renderPageInternal(pdfPageNum) {
              }
             if(questionSource) {
                 questionSource.textContent = `出典: ${editionDisplayText} 問${question.pageNum}`;
-                questionSource.style.display = 'block'; // 'inline'から変更
+                questionSource.style.display = 'block';
             }
             currentQuestionId = getQuestionId(question.edition, questionSubject, question.pageNum);
         } else {
@@ -240,7 +251,6 @@ function populateFieldSelector() {
         optionDiv.dataset.text = `${field.fieldName} (${questionCount}問)`;
         optionDiv.addEventListener('click', function(e) {
             e.stopPropagation();
-            // ★★★【元に戻す】元のシンプルなテキスト設定に戻す
             selectSelected.textContent = this.dataset.text;
             selectSelected.dataset.value = this.dataset.value;
             closeCustomSelect();
@@ -514,14 +524,11 @@ function setupEventListeners() {
     // カスタムプルダウンのイベントリスナー
     if (selectSelected) selectSelected.addEventListener('click', function(e) {
         e.stopPropagation(); // イベントの伝播を停止
-        // 他のカスタムセレクトが開いていたら閉じる（もし将来増やすなら）
-        // closeAllSelects(this);
         if(selectItems) selectItems.classList.toggle('select-hide');
         this.classList.toggle('select-arrow-active');
     });
     // ドキュメント全体に対するクリックイベントリスナー
     document.addEventListener('click', function() {
-        // すべてのカスタムセレクトを閉じる
         closeCustomSelect();
     });
 }
@@ -559,18 +566,16 @@ async function initialize() {
     resultAreaField = document.getElementById('result-area-field');
     scoreCorrectField = panelByField ? panelByField.querySelector('.score-correct') : null;
     showResultsBtnField = document.getElementById('show-results-btn-field');
-    // answerButtonsNodeList は setupEventListeners で取得
     questionSource = document.getElementById('question-source');
     resultsSummary = document.getElementById('results-summary');
     resultsList = document.getElementById('results-list');
     backToExerciseBtn = document.getElementById('back-to-exercise-btn');
 
-    // 必須要素の存在チェック
     const requiredElements = {
         editionSelect, customSelect, subjectSelectField, canvas, subjectSelectEdition,
         goBtnEdition, goBtnField, prevBtn, nextBtn, jumpToSelect, tabByEdition, tabByField,
         panelByEdition, panelByField, showResultsBtnEdition, showResultsBtnField, backToExerciseBtn,
-        resultsPanel, resultsSummary, resultsList, selectSelected, selectItems // カスタムセレクト要素もチェック
+        resultsPanel, resultsSummary, resultsList, selectSelected, selectItems
     };
     let missingElementId = null;
     for (const id in requiredElements) {
