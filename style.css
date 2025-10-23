@@ -80,9 +80,8 @@ h1 {
     display: flex; /* ラベルとセレクトを横並び */
     align-items: center;
     flex-grow: 1; /* 横幅いっぱいに広がる */
-    min-width: 200px; /* 折り返し時の最小幅 */
-    /* ↓追加: プルダウンが開いた時にコンテナが不必要に広がるのを防ぐ */
-    position: relative; 
+    /* ↓【ここが唯一の変更点】 最小幅を0にすることで、コンテンツの長さに引きずられることなく、親要素の幅に収まるようになります */
+    min-width: 0; 
 }
 .select-group label {
     margin-right: 0.5em;
@@ -99,12 +98,13 @@ select { /* 標準のselectタグのスタイル */
     min-width: 100px; /* 最小幅 */
 }
 
-/* ======== カスタムプルダウンのスタイル ======== */
+/* ======== カスタムプルダウンのスタイル (z-index削除・overflow削除) ======== */
 .custom-select {
     position: relative;
     flex-grow: 1;
-    min-width: 0; /* Flexアイテムが縮小できるようにする */
+    min-width: 0;
     font-size: 1em;
+    /* overflow: hidden; */ /* ← 削除 */
 }
 
 .select-selected {
@@ -120,8 +120,9 @@ select { /* 標準のselectタグのスタイル */
     height: 2.2em;
     box-sizing: border-box;
     line-height: 1.2em;
-    position: relative; 
+    position: relative; /* 矢印の位置基準のため残す */
     width: 100%;
+    /* z-index: 2; */ /* ← 削除 */
 }
 .select-selected:after { /* 矢印 */
     content: "";
@@ -131,6 +132,7 @@ select { /* 標準のselectタグのスタイル */
     transform: translateY(-50%);
     width: 0; height: 0; border: 5px solid transparent;
     border-color: #555 transparent transparent transparent;
+    /* z-index: 3; */ /* ← 削除 */
 }
 .select-selected.select-arrow-active:after {
     border-color: transparent transparent #555 transparent;
@@ -138,39 +140,18 @@ select { /* 標準のselectタグのスタイル */
 }
 
 .select-items {
-    position: absolute; 
-    background-color: #fff; 
-    top: 100%; 
-    left: 0; 
-    right: 0;
-    z-index: 99; 
-    border-radius: 0 0 4px 4px; 
-    max-height: 200px; 
-    overflow-y: auto;
-    border: 1px solid #ccc; 
-    border-top: none; 
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    /* ↓追加: 幅の計算基準をボーダーの内側にする */
-    box-sizing: border-box; 
+    position: absolute; background-color: #fff; top: 100%; left: 0; right: 0;
+    z-index: 99; border-radius: 0 0 4px 4px; max-height: 200px; overflow-y: auto;
+    border: 1px solid #ccc; border-top: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 .select-items div {
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center;
-    padding: 0.6em 0.8em; 
-    border-bottom: 1px solid #eee; 
-    cursor: pointer;
-    transition: background-color 0.1s ease; 
-    gap: 0.5em;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.6em 0.8em; border-bottom: 1px solid #eee; cursor: pointer;
+    transition: background-color 0.1s ease; gap: 0.5em;
 }
 .select-items div span:first-child {
-    flex-grow: 1; 
-    white-space: normal; 
-    overflow-wrap: break-word; 
-    text-align: left;
+    flex-grow: 1; white-space: normal; overflow-wrap: break-word; text-align: left;
     line-height: 1.3;
-    /* ↓【最重要】追加: Flexアイテムがコンテンツの幅に引きずられず、親要素の幅に合わせて正しく折り返すようにする */
-    min-width: 0; 
 }
 .select-items div:last-child { border-bottom: none; }
 .select-hide { display: none; }
@@ -284,14 +265,10 @@ select { /* 標準のselectタグのスタイル */
     body { padding: 0.5em; }
     h1 { font-size: 1.5em; }
     .control-panel, .navigation, .viewer-container, #results-panel { padding: 0.8em; }
-    .select-group { 
-      /* ↓修正: 2つ並んだ際に幅が均等になるように */
-      min-width: calc(50% - 0.5em); 
-      flex-basis: calc(50% - 0.5em);
-    }
-    .custom-select { width: 100%; }
+    .select-group { min-width: calc(50% - 1em); } /* 幅調整 */
+    .custom-select { width: 100%; } /* 幅いっぱいにする */
     .answer-btn { width: 38px; height: 38px; font-size: 1em; }
-    .actions-row { flex-direction: column; align-items: flex-start; }
+    .actions-row { flex-direction: column; align-items: flex-start; } /* 縦積みに */
     .score-counter, .results-btn, .result-area { width: 100%; text-align: left; margin-left: 0; }
     .result-area { margin-top: 0.5em; }
     .navigation { gap: 0.5em; }
