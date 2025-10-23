@@ -105,35 +105,46 @@ select { /* 標準のselectタグのスタイル */
     font-size: 1em;
 }
 
+/* 【変更】選択中の表示エリアのスタイル */
 .select-selected {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    display: block; /* ★追加: ブロック要素として幅を確定させる */
     background-color: #fff;
     padding: 0.5em;
     border: 1px solid #ccc;
     border-radius: 4px;
     cursor: pointer;
-    white-space: nowrap; /* 選択中のテキストは折り返さない */
-    overflow: hidden;
-    text-overflow: ellipsis; /* はみ出したら...で省略 */
+    white-space: nowrap; /* 折り返さない */
+    overflow: hidden; /* はみ出した部分を隠す */
+    text-overflow: ellipsis; /* 省略記号(...)を表示 */
     height: 2.2em;
     box-sizing: border-box;
+    line-height: 1.2em; /* ★追加: テキストの縦位置調整 */
+    padding-right: 30px; /* ★追加: 矢印スペース確保 */
+    position: relative; /* 矢印の位置基準 */
 }
 .select-selected:after { /* 矢印 */
-    content: ""; width: 0; height: 0; border: 5px solid transparent;
+    content: "";
+    position: absolute; /* ★変更: 絶対位置指定 */
+    top: 50%;             /* ★変更: 縦中央 */
+    right: 10px;          /* ★変更: 右端からの位置 */
+    transform: translateY(-50%); /* ★追加: 縦中央揃え */
+    width: 0; height: 0; border: 5px solid transparent;
     border-color: #555 transparent transparent transparent;
-    margin-left: 10px; flex-shrink: 0;
+    /* margin-left は不要に */
 }
 .select-selected.select-arrow-active:after {
-    border-color: transparent transparent #555 transparent; margin-top: -3px;
+    border-color: transparent transparent #555 transparent;
+    /* margin-top は不要に */
+    transform: translateY(-50%) translateY(-3px); /* 開いたときの微調整 */
 }
 
+/* ... .select-items 以降のスタイルは変更なし ... */
 .select-items {
     position: absolute; background-color: #fff; top: 100%; left: 0; right: 0;
     z-index: 99; border-radius: 0 0 4px 4px; max-height: 200px; overflow-y: auto;
     border: 1px solid #ccc; border-top: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
+/* ... 省略 ... */
 .select-items div {
     display: flex;
     justify-content: space-between;
