@@ -1,4 +1,4 @@
-// --- モジュールのインポート --
+// --- モジュールのインポート ---
 import * as pdfjsLib from './lib/pdfjs/build/pdf.mjs';
 pdfjsLib.GlobalWorkerOptions.workerSrc = './lib/pdfjs/build/pdf.worker.mjs';
 
@@ -9,7 +9,7 @@ let exerciseView, resultsPanel, welcomeOverlay, canvas, loadingSpinner,
     editionSelect, subjectSelectEdition, goBtnEdition, resultAreaEdition, scoreCorrectEdition, showResultsBtnEdition,
     subjectSelectField,
     customSelect, selectSelected, selectItems, // カスタムプルダウン用
-    goBtnField, resultAreaField, scoreCorrectField, showResultsBtnField, // ★★★【JSエラー修正】変数名のタイポを修正
+    goBtnField, resultAreaField, scoreCorrectField, showResultsBtnField,
     answerButtonsNodeList, // NodeList を保持する変数
     questionSource, resultsSummary, resultsList, backToExerciseBtn;
 
@@ -147,18 +147,23 @@ async function renderPageInternal(pdfPageNum) {
 
         const page = await pdfDoc.getPage(pdfPageNum + 1);
 
+        // ★★★【根本原因の修正】★★★
+        // 1. デバイスのピクセル比を取得し、高画質化
         const devicePixelRatio = window.devicePixelRatio || 1;
-        const containerWidth = canvas.clientWidth;
+        // 2. コンテナ（canvasの親）の現在の表示幅を取得
+        const containerWidth = canvas.parentElement.clientWidth;
+        // 3. 表示幅に合わせてPDFのスケールを自動計算
         const viewportDefault = page.getViewport({ scale: 1.0 });
         const scale = containerWidth / viewportDefault.width;
         const viewport = page.getViewport({ scale: scale * devicePixelRatio });
-
+        // 4. 計算したサイズでCanvasのサイズを設定
         const context = canvas.getContext('2d');
         canvas.height = viewport.height;
         canvas.width = viewport.width;
-
+        // 5. CSSで表示上のサイズを調整（これにより高解像度でも表示が大きくならない）
         canvas.style.height = `${viewport.height / devicePixelRatio}px`;
         canvas.style.width = `${viewport.width / devicePixelRatio}px`;
+        // ★★★【ここまでが修正箇所】★★★
 
         await page.render({ canvasContext: context, viewport }).promise;
 
@@ -223,10 +228,7 @@ async function renderPageInternal(pdfPageNum) {
 
 /** 分野別プルダウンを生成する (カスタム版) */
 function populateFieldSelector() {
-    if (!subjectSelectField || !selectItems || !selectSelected) {
-        console.error("❌ 分野プルダウン生成に必要な要素が見つかりません。");
-        return;
-    }
+    if (!subjectSelectField || !selectItems || !selectSelected) { return; }
     const subject = subjectSelectField.value;
     const fields = fieldsData[subject] || [];
     selectItems.innerHTML = '';
@@ -433,7 +435,7 @@ function setupEventListeners() {
         const selectedEdition = editionSelect ? editionSelect.value : '';
         const selectedSubject = subjectSelectEdition ? subjectSelectEdition.value : '';
         currentSessionQuestions = [];
-        const url = `./pdf/${selectedEdition}/${selectedEdition}_${selectedSubject}.pdf`;
+        const url = `./pdf/${selectedEdition}/${selectedSubject}.pdf`;
         showLoading(true);
         try {
             const tempLoadingTask = pdfjsLib.getDocument(url);
