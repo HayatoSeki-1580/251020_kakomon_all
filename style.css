@@ -79,8 +79,8 @@ h1 {
 .select-group {
     display: flex; /* ラベルとセレクトを横並び */
     align-items: center;
-    flex: 1;
-    min-width: 0;
+    flex: 1; /* flex-grow, shrink, basisをまとめて指定し、コンテンツ幅を無視させる */
+    min-width: 0; /* flexアイテムがコンテンツ幅に引きずられず縮小できるようにする */
 }
 .select-group label {
     margin-right: 0.5em;
@@ -100,8 +100,8 @@ select { /* 標準のselectタグのスタイル */
 /* ======== カスタムプルダウンのスタイル ======== */
 .custom-select {
     position: relative;
-    flex: 1;
-    min-width: 0;
+    flex: 1; /* 親要素に合わせて伸縮 */
+    min-width: 0; /* 縮小を許可 */
     font-size: 1em;
 }
 
@@ -136,20 +136,19 @@ select { /* 標準のselectタグのスタイル */
 }
 
 .select-items {
-    /* ★★★【最終修正】ここが最終的な修正箇所です ★★★ */
-    position: absolute; 
-    background-color: #fff; 
-    top: 100%; 
-    left: 0; 
-    /* right: 0; を width: 100%; に変更して幅を明示的に指定 */
+    position: absolute;
+    background-color: #fff;
+    top: 100%;
+    left: 0;
+    /* ★★★【修正点 1/2】幅を明示的に100%に指定し、borderを幅の内側に含めることで、親要素からはみ出さなくする */
     width: 100%;
-    box-sizing: border-box; /* borderを含めて幅を計算するようにする */
-    z-index: 99; 
-    border-radius: 0 0 4px 4px; 
-    max-height: 200px; 
+    box-sizing: border-box;
+    z-index: 99;
+    border-radius: 0 0 4px 4px;
+    max-height: 200px;
     overflow-y: auto;
-    border: 1px solid #ccc; 
-    border-top: none; 
+    border: 1px solid #ccc;
+    border-top: none;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 .select-items div {
@@ -158,8 +157,13 @@ select { /* 標準のselectタグのスタイル */
     transition: background-color 0.1s ease; gap: 0.5em;
 }
 .select-items div span:first-child {
-    flex-grow: 1; white-space: normal; overflow-wrap: break-word; text-align: left;
+    flex-grow: 1;
+    white-space: normal;
+    overflow-wrap: break-word;
+    text-align: left;
     line-height: 1.3;
+    /* ★★★【修正点 2/2】flexアイテムであるspanがコンテンツ幅に引きずられず、正しく折り返すようにする */
+    min-width: 0;
 }
 .select-items div:last-child { border-bottom: none; }
 .select-hide { display: none; }
