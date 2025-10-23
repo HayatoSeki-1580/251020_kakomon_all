@@ -22,7 +22,7 @@ let currentFieldIndex = 0;
 let correctCount = 0;
 let answerHistory = {};
 let currentSessionQuestions = [];
-// currentSubject と currentEdition は initialize で初期化
+// currentSubject と currentEdition は initialize または goBtn クリック時に設定
 
 /** ローディング表示を制御する関数 */
 function showLoading(show) {
@@ -37,6 +37,7 @@ function getQuestionId(edition, subject, pageNum) {
 
 /** 現在の問題情報から一意なIDを生成するヘルパー関数 */
 function getCurrentQuestionId() {
+    // 要素の存在を確認してから値を取得
     const currentSubjectVal = subjectSelectEdition ? subjectSelectEdition.value : '';
     const currentEditionVal = editionSelect ? editionSelect.value : '';
     const currentFieldSubjectVal = subjectSelectField ? subjectSelectField.value : '';
@@ -71,12 +72,12 @@ async function setupEditionSelector() {
 
 /** 分野別ファイル(fields.json)を読み込む */
 async function loadFieldsData() {
-    if (!customSelect) return; // カスタムセレクト要素で確認
+    if (!customSelect) return;
     try {
         const response = await fetch('./data/fields.json');
         if (!response.ok) throw new Error('HTTPエラー');
         fieldsData = await response.json();
-        populateFieldSelector(); // 初期科目で分野を生成
+        populateFieldSelector();
     } catch (error) { console.error("❌ fields.json読込エラー:", error); }
 }
 
@@ -104,11 +105,11 @@ async function renderPdf(edition, subject, pageNum = 1) {
         const loadingTask = pdfjsLib.getDocument(url, loadingTaskOptions);
         pdfDoc = await loadingTask.promise;
         const totalQuestions = pdfDoc.numPages > 1 ? pdfDoc.numPages - 1 : 0;
-        if (currentFieldQuestions.length === 0) { // 回数別モードの時のみ更新
+        if (currentFieldQuestions.length === 0) {
             if(pageCountSpan) pageCountSpan.textContent = totalQuestions;
             populateJumpSelector(totalQuestions);
         }
-        await renderPageInternal(currentPageNum); // 内部描画関数を呼ぶ
+        await renderPageInternal(currentPageNum);
     } catch (error) {
         console.error("❌ PDF読込エラー:", error);
         alert(`PDFファイルが見つかりません:\n${url}`);
@@ -327,20 +328,24 @@ function updateNavButtons() {
 
 /** 成績ページ表示 */
 function showResults() {
-    // 【修正】要素が存在するか確認してからクラス操作
-    if(!exerciseView || !resultsPanel) return;
+    // 【重要】要素が存在するかを再度確認
+    if(!exerciseView || !resultsPanel || !resultsList || !resultsSummary) {
+        console.error("成績表示に必要な要素が見つかりません。");
+        return;
+    }
+    console.log("📊 成績ページを表示"); // デバッグログ追加
     exerciseView.classList.add('hidden');
     resultsPanel.classList.remove('hidden');
     window.scrollTo(0, 0);
 
     const totalQuestions = currentSessionQuestions.length;
     let answeredCount = 0; let sessionCorrectCount = 0;
-    if(resultsList) resultsList.innerHTML = ''; // resultsListの存在確認
+    resultsList.innerHTML = '';
     const table = document.createElement('table');
     table.innerHTML = `<thead><tr><th>問題</th><th>結果</th><th>あなたの解答</th><th>正解</th><th>復習</th></tr></thead><tbody></tbody>`;
     const tbody = table.querySelector('tbody');
 
-    if (tbody) { // tbodyの存在確認
+    if (tbody) {
         currentSessionQuestions.forEach((qInfo, index) => {
             const questionId = getQuestionId(qInfo.edition, qInfo.subject, qInfo.pageNum);
             const history = answerHistory[questionId];
@@ -357,21 +362,20 @@ function showResults() {
             tr.innerHTML = `<td>${questionNumDisplay}</td><td class="${statusClass}">${statusText}</td><td>${yourAnswer}</td><td>${correctAnswer}</td><td><button class="review-btn" data-index="${index}">解き直す</button></td>`;
             tbody.appendChild(tr);
         });
-    } // tbody が存在する場合のみ処理
+    }
 
-    if(resultsList) resultsList.appendChild(table); // resultsListの存在確認
+    resultsList.appendChild(table);
 
     const accuracy = totalQuestions > 0 ? ((sessionCorrectCount / totalQuestions) * 100).toFixed(1) : 0;
-    if(resultsSummary) resultsSummary.innerHTML = `総問題数: ${totalQuestions}問 / 解答済み: ${answeredCount}問<br>正答数: ${sessionCorrectCount}問 / 正答率: ${accuracy}%`;
+    resultsSummary.innerHTML = `総問題数: ${totalQuestions}問 / 解答済み: ${answeredCount}問<br>正答数: ${sessionCorrectCount}問 / 正答率: ${accuracy}%`;
 
-    // 復習ボタンのリスナー設定 (querySelectorAll は NodeList を返すので要素存在確認は不要)
+    // 復習ボタンのリスナー設定
     document.querySelectorAll('.review-btn').forEach(button => {
         button.addEventListener('click', (e) => {
             const index = parseInt(e.target.dataset.index, 10);
             if (index < 0 || index >= currentSessionQuestions.length) return;
             const questionInfo = currentSessionQuestions[index];
-            if(resultsPanel) resultsPanel.classList.add('hidden');
-            if(exerciseView) exerciseView.classList.remove('hidden');
+            resultsPanel.classList.add('hidden'); exerciseView.classList.remove('hidden');
             if (currentFieldQuestions.length > 0) {
                  if(tabByField) tabByField.click();
                  if(subjectSelectField) subjectSelectField.value = questionInfo.subject;
@@ -504,7 +508,8 @@ function setupEventListeners() {
             if (target) { currentPageNum = target; renderPageInternal(currentPageNum); }
         }
     });
-    // 【修正】showResultsBtnの存在確認を追加
+
+    // 【重要】成績を見るボタンのリスナーをここで設定
     if (showResultsBtnEdition) showResultsBtnEdition.addEventListener('click', showResults);
     if (showResultsBtnField) showResultsBtnField.addEventListener('click', showResults);
     if (backToExerciseBtn) backToExerciseBtn.addEventListener('click', () => {
@@ -547,15 +552,15 @@ async function initialize() {
     goBtnEdition = document.getElementById('go-btn-edition');
     resultAreaEdition = document.getElementById('result-area-edition');
     scoreCorrectEdition = panelByEdition ? panelByEdition.querySelector('.score-correct') : null;
-    showResultsBtnEdition = document.getElementById('show-results-btn-edition');
+    showResultsBtnEdition = document.getElementById('show-results-btn-edition'); // ID確認
     subjectSelectField = document.getElementById('subject-select-field');
-    customSelect = document.getElementById('field-select-custom'); // カスタムプルダウンに変更
+    customSelect = document.getElementById('field-select-custom');
     selectSelected = customSelect ? customSelect.querySelector('.select-selected') : null;
     selectItems = customSelect ? customSelect.querySelector('.select-items') : null;
     goBtnField = document.getElementById('go-btn-field');
     resultAreaField = document.getElementById('result-area-field');
     scoreCorrectField = panelByField ? panelByField.querySelector('.score-correct') : null;
-    showResultsBtnField = document.getElementById('show-results-btn-field');
+    showResultsBtnField = document.getElementById('show-results-btn-field'); // ID確認
     // answerButtonsNodeList は setupEventListeners で取得
     questionSource = document.getElementById('question-source');
     resultsSummary = document.getElementById('results-summary');
@@ -566,7 +571,8 @@ async function initialize() {
     const requiredElements = {
         editionSelect, customSelect, subjectSelectField, canvas, subjectSelectEdition,
         goBtnEdition, goBtnField, prevBtn, nextBtn, jumpToSelect, tabByEdition, tabByField,
-        panelByEdition, panelByField, showResultsBtnEdition, showResultsBtnField, backToExerciseBtn
+        panelByEdition, panelByField, showResultsBtnEdition, showResultsBtnField, backToExerciseBtn, // ボタンの存在もチェック
+        resultsPanel, resultsSummary, resultsList // 成績パネル関連もチェック
     };
     let missingElementId = null;
     for (const id in requiredElements) {
