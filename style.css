@@ -77,22 +77,23 @@ h1 {
     justify-content: space-between;
 }
 
-/* ★★★【根本的解決策】FlexboxからGridレイアウトに変更 ★★★ */
+/* ★★★ デザイン復元 + 機能維持 ★★★ */
 .select-group {
-    display: grid; /* レイアウト方法をGridに変更 */
-    grid-template-columns: auto 1fr; /* 1列目:ラベル幅、2列目:残り全部 */
-    gap: 0.5em; /* ラベルとプルダウンの隙間 */
+    display: flex; /* 元の横並びレイアウトに戻す */
     align-items: center;
-    flex: 1 1 200px; /* 親コンテナ内での振る舞いを定義 */
-    min-width: 0; /* はみ出しを防ぐための最終防衛ライン */
+    flex-grow: 1; /* 横幅いっぱいに広がる */
+    min-width: 200px; /* 折り返し時の最小幅を元に戻す */
 }
 .select-group label {
+    margin-right: 0.5em; /* 元の隙間設定に戻す */
     font-weight: bold;
     white-space: nowrap;
-    /* margin-rightはgapで管理するため不要 */
 }
 select, .custom-select {
-    width: 100%; /* Gridのセル内で100%広がる */
+    flex-grow: 1; /* 横幅いっぱいに広がる */
+    width: auto; /* width指定を解除 */
+    /* ★★★ 機能の核となる重要設定 ★★★ */
+    /* これにより、中身のテキストの長さに影響されず、コンテナが正しく縮小します */
     min-width: 0;
 }
 
@@ -159,7 +160,7 @@ select, .custom-select {
 .freq-low { background-color: #2ecc71; }
 
 
-/* --- 省略 (以降のスタイルは変更の必要がないため、元のままで問題ありません) --- */
+/* --- 省略 (以降のスタイルは初期状態のままなので変更不要) --- */
 
 /* ======== 汎用クラス ======== */
 .hidden { display: none !important; }
@@ -169,9 +170,8 @@ select, .custom-select {
     body { padding: 0.5em; }
     h1 { font-size: 1.5em; }
     .control-panel, .navigation, .viewer-container, #results-panel { padding: 0.8em; }
-    .select-group {
-        flex-basis: 100%; /* スマホでは一行を専有する */
-    }
+    .select-group { min-width: calc(50% - 1em); }
+    .custom-select { width: 100%; }
     .answer-btn { width: 38px; height: 38px; font-size: 1em; }
     .actions-row { flex-direction: column; align-items: flex-start; }
     .score-counter, .results-btn, .result-area { width: 100%; text-align: left; margin-left: 0; }
