@@ -9,7 +9,7 @@ let exerciseView, resultsPanel, welcomeOverlay, canvas, loadingSpinner,
     editionSelect, subjectSelectEdition, goBtnEdition, resultAreaEdition, scoreCorrectEdition, showResultsBtnEdition,
     subjectSelectField,
     customSelect, selectSelected, selectItems, // カスタムプルダウン用
-    goBtnField, resultAreaField, scoreCorrectField, showResultsBtn-field,
+    goBtnField, resultAreaField, scoreCorrectField, showResultsBtnField, // ★★★【JSエラー修正】変数名のタイポを修正
     answerButtonsNodeList, // NodeList を保持する変数
     questionSource, resultsSummary, resultsList, backToExerciseBtn;
 
@@ -137,7 +137,7 @@ function populateJumpSelector(totalQuestions) {
     }
 }
 
-// ★★★【画質改善】PDF描画関数を修正 ★★★
+/** 指定されたページを描画する（内部関数） */
 async function renderPageInternal(pdfPageNum) {
     if (!pdfDoc || !canvas) return;
     try {
@@ -147,27 +147,19 @@ async function renderPageInternal(pdfPageNum) {
 
         const page = await pdfDoc.getPage(pdfPageNum + 1);
 
-        // 1. デバイスのピクセル比を取得（Retinaディスプレイなどでは2や3になる）
         const devicePixelRatio = window.devicePixelRatio || 1;
-
-        // 2. コンテナの現在の表示幅を取得
         const containerWidth = canvas.clientWidth;
-
-        // 3. 表示幅に合わせてPDFのスケールを計算
         const viewportDefault = page.getViewport({ scale: 1.0 });
         const scale = containerWidth / viewportDefault.width;
-        const viewport = page.getViewport({ scale: scale * devicePixelRatio }); // ★★★ スケールにピクセル比を乗算
+        const viewport = page.getViewport({ scale: scale * devicePixelRatio });
 
-        // 4. 計算したスケールでCanvasの物理的なサイズ（ピクセル数）を設定
         const context = canvas.getContext('2d');
         canvas.height = viewport.height;
         canvas.width = viewport.width;
 
-        // 5. CSSでCanvasの表示サイズをコンテナの幅に合わせる（これにより高解像度でも表示が大きくならない）
         canvas.style.height = `${viewport.height / devicePixelRatio}px`;
         canvas.style.width = `${viewport.width / devicePixelRatio}px`;
 
-        // 6. CanvasにPDFを描画
         await page.render({ canvasContext: context, viewport }).promise;
 
         let currentQuestionId;
@@ -462,7 +454,7 @@ function setupEventListeners() {
         if(welcomeOverlay) welcomeOverlay.style.display = 'none'; window.scrollTo(0, 0);
         correctCount = 0; updateScoreDisplay(); answerHistory = {};
         const subject = subjectSelectField ? subjectSelectField.value : '';
-        const fieldIndex = selectSelected ? selectSelected.dataset.value : ''; // カスタムプルダウンから取得
+        const fieldIndex = selectSelected ? selectSelected.dataset.value : '';
         if (fieldIndex === "" || !fieldsData[subject] || !fieldsData[subject][fieldIndex]) {
             alert("分野を選択してください。"); return;
         }
@@ -525,7 +517,6 @@ function setupEventListeners() {
         if(exerciseView) exerciseView.classList.remove('hidden');
     });
 
-    // カスタムプルダウンのイベントリスナー
     if (selectSelected) selectSelected.addEventListener('click', function(e) {
         e.stopPropagation();
         if(selectItems) selectItems.classList.toggle('select-hide');
@@ -540,7 +531,6 @@ function setupEventListeners() {
 async function initialize() {
     console.log("🔄 アプリケーションの初期化を開始...");
 
-    // --- HTML要素の取得 ---
     exerciseView = document.getElementById('exercise-view');
     resultsPanel = document.getElementById('results-panel');
     welcomeOverlay = document.getElementById('welcome-overlay');
@@ -598,5 +588,4 @@ async function initialize() {
     console.log("✅ 初期化完了。");
 }
 
-// --- アプリケーションの実行 ---
 document.addEventListener('DOMContentLoaded', initialize);
