@@ -238,10 +238,14 @@ function populateFieldSelector() {
         optionDiv.innerHTML = `<span>${field.fieldName} (${questionCount}問)</span><span class="freq-bar-container"><span class="freq-bar ${colorClass}" style="width: ${barWidthPercent}%;"></span></span>`;
         optionDiv.dataset.value = index;
         optionDiv.dataset.text = `${field.fieldName} (${questionCount}問)`;
-        optionDiv.addEventListener('click', function(e) {
+       optionDiv.addEventListener('click', function(e) {
             e.stopPropagation();
-            selectSelected.textContent = this.dataset.text;
+            
+            // ★★★【変更】元のテキストをdatasetに保存し、テキスト設定は新関数に任せる
+            selectSelected.dataset.fullText = this.dataset.text; // 元のテキストを保存
             selectSelected.dataset.value = this.dataset.value;
+            truncateSelectedText(); // 新しい関数を呼び出して表示を更新
+
             closeCustomSelect();
             const currentSelected = selectItems.querySelector('.same-as-selected');
             if (currentSelected) currentSelected.classList.remove('same-as-selected');
@@ -404,7 +408,33 @@ function closeCustomSelect() {
     if(selectItems) selectItems.classList.add('select-hide');
     if(selectSelected) selectSelected.classList.remove('select-arrow-active');
 }
+// ★★★【追加】画面サイズに応じて選択されたテキストを短縮する新関数 ★★★
+function truncateSelectedText() {
+    if (!selectSelected || !selectSelected.dataset.fullText) {
+        return; // 対象要素や元のテキストがなければ何もしない
+    }
 
+    const fullText = selectSelected.dataset.fullText;
+    const screenWidth = window.innerWidth;
+    let maxLength;
+
+    // 画面幅に応じて最大文字数を設定
+    if (screenWidth < 400) {
+        maxLength = 15; // スマホ（縦）など
+    } else if (screenWidth < 600) {
+        maxLength = 25; // スマホ（横）など
+    } else {
+        selectSelected.textContent = fullText; // PCサイズでは制限しない
+        return;
+    }
+
+    // 文字数が制限を超えていたら短縮
+    if (fullText.length > maxLength) {
+        selectSelected.textContent = fullText.substring(0, maxLength) + '...';
+    } else {
+        selectSelected.textContent = fullText;
+    }
+}
 // --- イベントリスナー設定関数 ---
 function setupEventListeners() {
     answerButtonsNodeList = document.querySelectorAll('.answer-btn');
@@ -523,6 +553,8 @@ function setupEventListeners() {
         // すべてのカスタムセレクトを閉じる
         closeCustomSelect();
     });
+    // ★★★【追加】ウィンドウのリサイズを監視してテキストを更新
+    window.addEventListener('resize', truncateSelectedText);
 }
 
 /** 初期化処理 */
