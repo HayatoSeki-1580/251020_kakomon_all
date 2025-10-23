@@ -97,10 +97,9 @@ select { /* 標準のselectタグのスタイル */
     min-width: 100px; /* 最小幅 */
 }
 
-/* ======== カスタムプルダウンのスタイル (改善版) ======== */
+/* ======== カスタムプルダウンのスタイル (折り返し対応版) ======== */
 .custom-select {
     position: relative;
-    /* width: 350px; */ /* 固定幅をやめる */
     flex-grow: 1; /* 横幅いっぱいに広がる */
     min-width: 200px; /* 最小幅 */
     font-size: 1em;
@@ -115,9 +114,9 @@ select { /* 標準のselectタグのスタイル */
     border: 1px solid #ccc;
     border-radius: 4px;
     cursor: pointer;
-    white-space: nowrap;
+    white-space: nowrap; /* 選択中のテキストは折り返さない */
     overflow: hidden;
-    text-overflow: ellipsis;
+    text-overflow: ellipsis; /* はみ出したら...で省略 */
     height: 2.2em;
     box-sizing: border-box;
 }
@@ -135,26 +134,22 @@ select { /* 標準のselectタグのスタイル */
     z-index: 99; border-radius: 0 0 4px 4px; max-height: 200px; overflow-y: auto;
     border: 1px solid #ccc; border-top: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
-/* 【変更】選択肢のdiv要素のスタイル */
 .select-items div {
-    display: flex; /* Flexboxで内部要素を配置 */
-    justify-content: space-between; /* テキストとバーを両端に */
-    align-items: center; /* 垂直方向中央揃え */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 0.6em 0.8em;
-    border-bottom: 1px solid #eee; /* 区切り線 */
+    border-bottom: 1px solid #eee;
     cursor: pointer;
-    /* white-space: nowrap; */ /* ← 折り返しのために削除 */
-    font-family: Consolas, "Courier New", monospace;
     transition: background-color 0.1s ease;
     gap: 0.5em; /* テキストとバーの間隔 */
 }
-/* 【追加】テキスト部分のスタイル */
-.select-items div span:first-child {
-    flex-grow: 1; /* テキストが可能な限り幅を取る */
-    white-space: normal; /* 折り返しを許可 */
-    overflow-wrap: break-word; /* 長い単語でも折り返す */
-    text-align: left; /* 左揃え */
-    /* font-family: sans-serif; */ /* 等幅フォント指定をやめる場合 */
+.select-items div span:first-child { /* テキスト部分 */
+    flex-grow: 1; /* 幅を取るように */
+    white-space: normal; /* 折り返し許可 */
+    overflow-wrap: break-word; /* 単語の途中でも折り返す */
+    text-align: left;
+    line-height: 1.3;
 }
 .select-items div:last-child {
     border-bottom: none;
@@ -168,37 +163,33 @@ select { /* 標準のselectタグのスタイル */
     background-color: #007bff;
     color: white;
 }
-.select-items div:hover .freq-bar-container {
-    background-color: #e9ecef;
-}
-.select-items div:hover .freq-bar {
-     opacity: 0.8;
-}
+.select-items div:hover .freq-bar-container { background-color: #e9ecef; }
+.select-items div:hover .freq-bar { opacity: 0.8; }
 
-.same-as-selected { /* 現在選択中の項目を少し強調 */
+.same-as-selected {
     background-color: #f8f9fa !important;
     color: #333 !important;
     font-weight: bold;
 }
-.same-as-selected .freq-bar-container {
-     background-color: #e9ecef !important;
-}
-.same-as-selected .freq-bar {
-     opacity: 1 !important;
-}
+.same-as-selected .freq-bar-container { background-color: #e9ecef !important; }
+.same-as-selected .freq-bar { opacity: 1 !important; }
 
-/* ======== 頻出度バー ======== */
-/* ... (変更なし) ... */
 
 /* ======== 頻出度バー ======== */
 .freq-bar-container {
-    margin-left: auto; width: 50px; height: 10px; background-color: #e9ecef;
-    border-radius: 2px; overflow: hidden; flex-shrink: 0;
+    margin-left: auto; /* 右寄せ */
+    width: 50px;
+    height: 10px;
+    background-color: #e9ecef;
+    border-radius: 2px;
+    overflow: hidden;
+    flex-shrink: 0;
 }
 .freq-bar { display: block; height: 100%; border-radius: 2px; transition: width 0.3s ease; }
-.freq-high { background-color: #e74c3c; } /* 赤 */
-.freq-medium { background-color: #f39c12; } /* 黄 */
-.freq-low { background-color: #2ecc71; } /* 緑 */
+.freq-high { background-color: #e74c3c; }
+.freq-medium { background-color: #f39c12; }
+.freq-low { background-color: #2ecc71; }
+
 
 /* ======== ナビゲーションエリア ======== */
 .navigation {
@@ -307,3 +298,4 @@ select { /* 標準のselectタグのスタイル */
     .source-info { margin-left: 0; margin-top: 0.5em; width: 100%; text-align: right; }
     #results-list th, #results-list td { padding: 0.4em; font-size: 0.8em; }
 }
+
