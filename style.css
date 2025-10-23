@@ -67,14 +67,18 @@ h1 {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     margin-bottom: 1em;
 }
-.top-row, .actions-row {
+.top-row {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 0.8em 1em;
 }
 .actions-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
     justify-content: space-between;
+    gap: 0.8em 1em;
 }
 .select-group {
     display: grid;
@@ -130,19 +134,9 @@ select, .custom-select {
 }
 
 .select-items {
-    position: absolute;
-    background-color: #fff;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    box-sizing: border-box;
-    z-index: 99;
-    border-radius: 0 0 4px 4px;
-    max-height: 200px;
-    overflow-y: auto;
-    border: 1px solid #ccc;
-    border-top: none;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    position: absolute; background-color: #fff; top: 100%; left: 0; right: 0;
+    z-index: 99; border-radius: 0 0 4px 4px; max-height: 200px; overflow-y: auto;
+    border: 1px solid #ccc; border-top: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 .select-items div {
     display: flex; justify-content: space-between; align-items: center;
@@ -150,55 +144,58 @@ select, .custom-select {
     transition: background-color 0.1s ease; gap: 0.5em;
 }
 .select-items div span:first-child {
-    flex-grow: 1;
-    white-space: normal;
-    overflow-wrap: break-word;
-    text-align: left;
-    line-height: 1.3;
-    min-width: 0;
+    flex-grow: 1; white-space: normal; overflow-wrap: break-word; text-align: left;
+    line-height: 1.3; min-width: 0;
 }
 .select-items div:last-child { border-bottom: none; }
 .select-hide { display: none; }
 .select-items div:hover { background-color: #007bff; color: white; }
 .same-as-selected { background-color: #f8f9fa !important; color: #333 !important; font-weight: bold; }
-.freq-bar-container {
-    margin-left: auto; width: 50px; height: 10px; background-color: #e9ecef;
-    border-radius: 2px; overflow: hidden; flex-shrink: 0;
-}
+.freq-bar-container { margin-left: auto; width: 50px; height: 10px; background-color: #e9ecef; border-radius: 2px; overflow: hidden; flex-shrink: 0; }
 .freq-bar { display: block; height: 100%; border-radius: 2px; transition: width 0.3s ease; }
 .freq-high { background-color: #e74c3c; }
 .freq-medium { background-color: #f39c12; }
 .freq-low { background-color: #2ecc71; }
 
 
-/* ======== ナビゲーションエリア ======== */
+/* ★★★【最終修正】ナビゲーションバーをGridレイアウトに変更 ★★★ */
 .navigation {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    /* PC用: 柔軟な列構成 */
+    grid-template-columns: auto auto auto 1fr;
+    /* スマホ用: 3列構成に上書き */
+    grid-template-areas:
+        "prev page next"
+        "jump jump jump"
+        "source source source";
+    gap: 0.8em;
     align-items: center;
-    gap: 0.5em 0.8em;
     margin-bottom: 1em;
 }
-.navigation button {
-    padding: 0.5em 1em; border: none; background-color: #007bff; color: white;
-    border-radius: 4px; cursor: pointer; transition: background-color 0.2s;
-    flex-shrink: 0;
-}
-.navigation button:disabled { background-color: #ccc; cursor: not-allowed; }
-.navigation button:hover:not(:disabled) { background-color: #0056b3; }
-#page-indicator { font-size: 1.1em; font-weight: bold; min-width: 60px; text-align: center; }
-.jump-select { width: 90px; flex-shrink: 0; }
+
+/* 各要素をGridのエリアに配置 */
+#prev-btn { grid-area: prev; justify-self: start; }
+#page-indicator { grid-area: page; }
+#next-btn { grid-area: next; justify-self: end; }
+.jump-select { grid-area: jump; width: 100%; } /* 幅を100%に */
 .source-info {
+    grid-area: source;
     font-size: 0.9em; color: #555; font-weight: bold;
     padding: 0.5em; background-color: #e9ecef; border-radius: 4px;
     display: none;
     white-space: normal;
     text-align: right;
-    flex-basis: 100%;
-    margin-top: 0.5em;
-    /* ★★★【最終修正】矛盾の原因となっていたこの一行を完全に削除します */
-    /* margin-left: auto; */
+    width: 100%;
 }
+
+.navigation button {
+    padding: 0.5em 1em; border: none; background-color: #007bff; color: white;
+    border-radius: 4px; cursor: pointer; transition: background-color 0.2s;
+}
+.navigation button:disabled { background-color: #ccc; cursor: not-allowed; }
+.navigation button:hover:not(:disabled) { background-color: #0056b3; }
+#page-indicator { font-size: 1.1em; font-weight: bold; text-align: center; }
+
 
 /* --- 省略 (PDF表示エリア以降のスタイルは変更なし) --- */
 
@@ -219,4 +216,21 @@ select, .custom-select {
     .result-area { margin-top: 0.5em; }
     #results-list th, #results-list td { padding: 0.4em; font-size: 0.8em; }
     .freq-bar-container { display: none; }
+}
+
+/* PC用のレイアウトを再定義 */
+@media (min-width: 601px) {
+    .navigation {
+        display: flex; /* PCではFlexboxに戻す */
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.8em;
+    }
+    .jump-select { width: 90px; }
+    .source-info {
+        width: auto;
+        margin-left: auto;
+        flex-basis: auto;
+        margin-top: 0;
+    }
 }
