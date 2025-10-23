@@ -172,13 +172,12 @@ select {
 }
 .navigation button:disabled { background-color: #ccc; cursor: not-allowed; }
 .navigation button:hover:not(:disabled), #go-btn-edition:hover, #go-btn-field:hover { background-color: #0056b3; }
-#page-indicator { font-size: 1.1em; font-weight: bold; min-width: 60px; text-align: center; }
+#page-indicator { font-size: 1.1em; font-weight: bold; min-width: 60px; text-align: center; flex-grow: 1; }
 .jump-select { width: 90px; flex-shrink: 0; }
-/* ★★★【デザイン修正】出典表示のデザインを初期状態に戻す */
 .source-info {
-    font-size: 0.9em; color: #555; font-weight: bold; margin-left: auto; /* 右寄せ */
+    font-size: 0.9em; color: #555; font-weight: bold; margin-left: auto;
     padding: 0.5em; background-color: #e9ecef; border-radius: 4px; display: none;
-    white-space: normal; /* 折り返しは許可する */
+    white-space: normal;
 }
 
 
@@ -197,7 +196,7 @@ select {
 #welcome-overlay h2 { margin-top: 0; font-size: 1.2em; }
 #welcome-overlay p { font-size: 1em; }
 
-/* ★★★【デザイン修正】解答ボタンのデザインを初期状態に戻す */
+/* ======== 解答エリア ======== */
 .answer-group { display: flex; align-items: center; gap: 0.8em; }
 .answer-label { font-weight: bold; white-space: nowrap; }
 .answer-buttons { display: flex; gap: 0.5em; }
@@ -266,7 +265,15 @@ select {
     .score-counter, .results-btn, .result-area { width: 100%; text-align: left; margin-left: 0; }
     .result-area { margin-top: 0.5em; }
     .navigation { gap: 0.5em; }
-    .source-info { margin-left: 0; margin-top: 0.5em; width: 100%; text-align: right; }
+    /* ★★★【副原因の対策】ナビゲーションの特定要素を強制的に改行させる */
+    .jump-select, .source-info {
+        flex-basis: 100%;
+        width: 100%;
+        margin-left: 0;
+    }
+    .source-info {
+        text-align: right;
+    }
     #results-list th, #results-list td { padding: 0.4em; font-size: 0.8em; }
     .freq-bar-container { display: none; }
 }
