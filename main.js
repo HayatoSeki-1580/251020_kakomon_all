@@ -9,7 +9,7 @@ let exerciseView, resultsPanel, welcomeOverlay, canvas, loadingSpinner,
     editionSelect, subjectSelectEdition, goBtnEdition, resultAreaEdition, scoreCorrectEdition, showResultsBtnEdition,
     subjectSelectField,
     customSelect, selectSelected, selectItems, // カスタムプルダウン用
-    goBtnField, resultAreaField, scoreCorrectField, showResultsBtnField,
+    goBtnField, resultAreaField, scoreCorrectField, showResultsBtn-field,
     answerButtonsNodeList, // NodeList を保持する変数
     questionSource, resultsSummary, resultsList, backToExerciseBtn;
 
@@ -22,7 +22,6 @@ let currentFieldIndex = 0;
 let correctCount = 0;
 let answerHistory = {};
 let currentSessionQuestions = [];
-// currentSubject と currentEdition は initialize または goBtn クリック時に設定
 
 /** ローディング表示を制御する関数 */
 function showLoading(show) {
@@ -37,7 +36,6 @@ function getQuestionId(edition, subject, pageNum) {
 
 /** 現在の問題情報から一意なIDを生成するヘルパー関数 */
 function getCurrentQuestionId() {
-    // 要素の存在を確認してから値を取得
     const currentSubjectVal = subjectSelectEdition ? subjectSelectEdition.value : '';
     const currentEditionVal = editionSelect ? editionSelect.value : '';
     const currentFieldSubjectVal = subjectSelectField ? subjectSelectField.value : '';
@@ -72,7 +70,6 @@ async function setupEditionSelector() {
 
 /** 分野別ファイル(fields.json)を読み込む */
 async function loadFieldsData() {
-     // カスタムセレクト要素が存在するか確認
     if (!customSelect) {
         console.error("❌ カスタムセレクト要素が見つかりません (loadFieldsData)");
         return;
@@ -81,7 +78,7 @@ async function loadFieldsData() {
         const response = await fetch('./data/fields.json');
         if (!response.ok) throw new Error('HTTPエラー');
         fieldsData = await response.json();
-        populateFieldSelector(); // 初期科目で分野を生成
+        populateFieldSelector();
     } catch (error) { console.error("❌ fields.json読込エラー:", error); }
 }
 
@@ -109,11 +106,11 @@ async function renderPdf(edition, subject, pageNum = 1) {
         const loadingTask = pdfjsLib.getDocument(url, loadingTaskOptions);
         pdfDoc = await loadingTask.promise;
         const totalQuestions = pdfDoc.numPages > 1 ? pdfDoc.numPages - 1 : 0;
-        if (currentFieldQuestions.length === 0) { // 回数別モードの時のみ更新
+        if (currentFieldQuestions.length === 0) {
             if(pageCountSpan) pageCountSpan.textContent = totalQuestions;
             populateJumpSelector(totalQuestions);
         }
-        await renderPageInternal(currentPageNum); // 内部描画関数を呼ぶ
+        await renderPageInternal(currentPageNum);
     } catch (error) {
         console.error("❌ PDF読込エラー:", error);
         alert(`PDFファイルが見つかりません:\n${url}`);
@@ -140,7 +137,7 @@ function populateJumpSelector(totalQuestions) {
     }
 }
 
-// ★★★【最終修正】PDF描画関数を全面的に刷新 ★★★
+// ★★★【画質改善】PDF描画関数を修正 ★★★
 async function renderPageInternal(pdfPageNum) {
     if (!pdfDoc || !canvas) return;
     try {
@@ -150,20 +147,27 @@ async function renderPageInternal(pdfPageNum) {
 
         const page = await pdfDoc.getPage(pdfPageNum + 1);
 
-        // 1. コンテナの現在の表示幅を取得
+        // 1. デバイスのピクセル比を取得（Retinaディスプレイなどでは2や3になる）
+        const devicePixelRatio = window.devicePixelRatio || 1;
+
+        // 2. コンテナの現在の表示幅を取得
         const containerWidth = canvas.clientWidth;
 
-        // 2. 表示幅に合わせてPDFのスケールを計算
+        // 3. 表示幅に合わせてPDFのスケールを計算
         const viewportDefault = page.getViewport({ scale: 1.0 });
         const scale = containerWidth / viewportDefault.width;
-        const viewport = page.getViewport({ scale: scale });
+        const viewport = page.getViewport({ scale: scale * devicePixelRatio }); // ★★★ スケールにピクセル比を乗算
 
-        // 3. 計算したスケールでCanvasの物理的なサイズを設定
+        // 4. 計算したスケールでCanvasの物理的なサイズ（ピクセル数）を設定
         const context = canvas.getContext('2d');
         canvas.height = viewport.height;
         canvas.width = viewport.width;
 
-        // 4. CanvasにPDFを描画
+        // 5. CSSでCanvasの表示サイズをコンテナの幅に合わせる（これにより高解像度でも表示が大きくならない）
+        canvas.style.height = `${viewport.height / devicePixelRatio}px`;
+        canvas.style.width = `${viewport.width / devicePixelRatio}px`;
+
+        // 6. CanvasにPDFを描画
         await page.render({ canvasContext: context, viewport }).promise;
 
         let currentQuestionId;
@@ -523,11 +527,10 @@ function setupEventListeners() {
 
     // カスタムプルダウンのイベントリスナー
     if (selectSelected) selectSelected.addEventListener('click', function(e) {
-        e.stopPropagation(); // イベントの伝播を停止
+        e.stopPropagation();
         if(selectItems) selectItems.classList.toggle('select-hide');
         this.classList.toggle('select-arrow-active');
     });
-    // ドキュメント全体に対するクリックイベントリスナー
     document.addEventListener('click', function() {
         closeCustomSelect();
     });
@@ -587,10 +590,8 @@ async function initialize() {
         return;
     }
 
-    // イベントリスナーの設定
     setupEventListeners();
 
-    // 非同期処理の実行
     await setupEditionSelector();
     await loadFieldsData();
 
